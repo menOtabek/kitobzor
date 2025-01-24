@@ -53,3 +53,9 @@ class Location(BaseModel):
     latitude = models.FloatField()
     longitude = models.FloatField()
     is_main = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.user}'
+
+    class Meta:
+        ordering = ['-created_at']
