@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from abstract_model.base_model import BaseModel
 
@@ -31,10 +32,17 @@ class Book(BaseModel):
     pages = models.PositiveIntegerField()
     published_at = models.PositiveIntegerField()
     status = models.IntegerField(choices=BOOK_STATUS, default=1)
-    isbn = models.CharField(max_length=20)
+    isbn = models.CharField(max_length=20, blank=True, null=True)
+    owner = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.user and self.user.role not in [1, 2]:
+            raise ValidationError('Permission denied')
+        self.owner = True
+        self.save()
 
 
 class BookPicture(BaseModel):
@@ -73,12 +81,3 @@ class BookCommentRating(BaseModel):
 
     def __str__(self):
         return f'Rating for comment of {self.book.name}'
-
-
-class DefaultBookOffer(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
-    book_name = models.CharField(max_length=150)
-    book_author = models.CharField(max_length=150)
-
-    def __str__(self):
-        return f'Offer for {self.book_name}'

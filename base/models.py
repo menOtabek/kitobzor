@@ -1,23 +1,24 @@
 from django.db import models
+from abstract_model.base_model import BaseModel
 
-class Region(models.Model):
+class Region(BaseModel):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 
-class District(models.Model):
+class District(BaseModel):
     name = models.CharField(max_length=100)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
-
-class Address(models.Model):
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+class DefaultBookOffer(BaseModel):
+    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
+    book_name = models.CharField(max_length=150)
+    book_author = models.CharField(max_length=150)
 
     def __str__(self):
-        return f'lat: {self.latitude}, long: {self.longitude}'
+        return f'Offer for {self.book_name}'
