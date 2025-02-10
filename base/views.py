@@ -29,8 +29,8 @@ class DistrictViewSet(ViewSet):
         responses={status.HTTP_200_OK: DistrictSerializer(many=True)},
         tags=['District']
     )
-    def get_district(self, request, region_id):
-        districts = District.objects.get(region_id=region_id)
+    def get_district(self, request, pk):
+        districts = District.objects.get(region_id=pk)
         serializer = DistrictSerializer(districts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
@@ -43,7 +43,7 @@ class DefaultBookOfferViewSet(ViewSet):
         request_body=DefaultBookOfferCreateSerializer,
         tags=['BookOffer']
     )
-    def create_book_offer(self, request):
+    def create_offer(self, request):
         serializer = DefaultBookOfferCreateSerializer(data=request.data)
         if not serializer.is_valid():
             return CustomApiException(ErrorCodes.INVALID_INPUT, message=serializer.errors)
@@ -57,7 +57,7 @@ class DefaultBookOfferViewSet(ViewSet):
         responses={status.HTTP_200_OK: DistrictSerializer(many=True)},
         tags=['BookOffer']
     )
-    def get_book_offer(self, request):
+    def get_offer(self, request):
         user = request.user
         book_offers = DefaultBookOffer.objects.filter(user_id=user.id)
         serializer = DefaultBookOfferSerializer(book_offers, many=True, context={'request': request})
