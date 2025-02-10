@@ -30,7 +30,6 @@ class Book(BaseModel):
     price = models.PositiveIntegerField()
     pages = models.PositiveIntegerField()
     published_at = models.PositiveIntegerField()
-    stock_quantity = models.PositiveIntegerField()
     status = models.IntegerField(choices=BOOK_STATUS, default=1)
     isbn = models.CharField(max_length=20)
 
