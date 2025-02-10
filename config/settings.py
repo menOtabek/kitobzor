@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zzaq!tr@=v-w9%$vq_1le1cxgf_e($zu!h52e_$(xcidu9odm$'
-
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-zzaq!tr@=v-w9%$vq_1le1cxgf_e($zu!h52e_$(xcidu9odm$')
+SHOW_SWAGGER = int(os.getenv('DJANGO_SHOW_SWAGGER', 0))
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.getenv('DJANGO_DEBUG', 1))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 
 # Application definition
@@ -46,13 +48,13 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'modeltranslation',
+    # 'tinymce'
 
     # local apps
     'base',
     'authentication',
     'blog',
     'sharing',
-    'shop',
 ]
 
 MIDDLEWARE = [
@@ -83,18 +85,34 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'default'),
+        'USER': os.getenv('DB_USER', 'default'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'default'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', 5432),
     }
 }
+
+
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -133,8 +151,6 @@ SWAGGER_SETTINGS = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -155,7 +171,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'uz-uz'
 
 get_text = lambda x: x
 LANGUAGES = {
@@ -164,7 +180,7 @@ LANGUAGES = {
     'en': get_text('English'),
 }
 
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
 MODELTRANSLATION_LANGUAGES = ('uz', 'ru', 'en')
 
 TIME_ZONE = 'Asia/Tashkent'
@@ -176,6 +192,36 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+
+# TINYMCE_DEFAULT_CONFIG = {
+#     'height': 500,
+#     'width': '100%',
+#     'plugins': 'advlist autolink lists link image charmap preview anchor '
+#                'searchreplace visualblocks code fullscreen insertdatetime media table paste help',
+#     'toolbar': 'undo redo | styleselect | bold italic | link image media | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+#     'image_advtab': True,  # Enables advanced image options
+#     'file_picker_callback': 'function(callback, value, meta) { \
+#         if (meta.filetype === "image") { \
+#             var input = document.createElement("input"); \
+#             input.setAttribute("type", "file"); \
+#             input.setAttribute("accept", "image/*"); \
+#             input.onchange = function() { \
+#                 var file = this.files[0]; \
+#                 var reader = new FileReader(); \
+#                 reader.onload = function() { \
+#                     callback(reader.result, { alt: file.name }); \
+#                 }; \
+#                 reader.readAsDataURL(file); \
+#             }; \
+#             input.click(); \
+#         } \
+#     }',
+#     'entity_encoding': 'raw',  # Prevents encoding of special characters
+#     'valid_elements': '*[*]',  # Allows all elements and attributes (optional)
+# }
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+# FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'

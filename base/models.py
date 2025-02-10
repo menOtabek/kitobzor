@@ -18,7 +18,6 @@ class District(models.Model):
 class Address(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
-    district = models.ForeignKey(District, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.district.name
+        return f'lat: {self.latitude}, long: {self.longitude}'

@@ -28,6 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('authentication.urls')),
     path('api/v1/', include('base.urls')),
+    path('api/v1/sharing/', include('sharing.urls')),
 
 
     re_path(r'static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
