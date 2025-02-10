@@ -1,24 +1,25 @@
 from rest_framework import serializers
-from .models import DefaultBookOffer
-
-class RegionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField()
+from .models import DefaultBookOffer, Region, District
 
 
-class DistrictSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    region = serializers.PrimaryKeyRelatedField()
-    name = serializers.CharField()
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ('id', 'name')
 
+
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = ('id', 'name', 'region')
 
 class DefaultBookOfferCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DefaultBookOffer
         fields = ('user', 'book_name', 'book_author')
 
-class DefaultBookOfferSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    user = serializers.PrimaryKeyRelatedField()
-    book_name = serializers.CharField()
-    book_author = serializers.CharField()
+
+class DefaultBookOfferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DefaultBookOffer
+        fields = ('id', 'user', 'book_name', 'book_author')
