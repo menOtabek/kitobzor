@@ -9,8 +9,7 @@ USER_ROLES = (
 )
 
 class User(BaseModel):
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    password = models.CharField(max_length=4)
+    phone_number = models.CharField(max_length=15, unique=True)
     bot_id = models.CharField(max_length=77, unique=True)
     role = models.IntegerField(choices=USER_ROLES, default=3)
     is_active = models.BooleanField(default=True)
@@ -39,13 +38,13 @@ class Otp(BaseModel):
 
 class Profile(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to='users/pictures', blank=True, null=True)
-    first_name = models.CharField(max_length=100, blank=True, null=True)
+    picture = models.ImageField(upload_to='users/pictures', default='')
+    first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100, blank=True, null=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user}'
