@@ -17,7 +17,7 @@ class PostComment(BaseModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey('authentication.User', on_delete=models.CASCADE)
     comment = models.TextField()
-    like = models.ManyToManyField('authentication.User', related_name='comment_likes', blank=True)
+    like = models.ManyToManyField('authentication.User', related_name='post_comment_likes', blank=True)
 
     def __str__(self):
         return f'Comment to {self.post} by {self.user}'
