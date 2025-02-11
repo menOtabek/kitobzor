@@ -37,7 +37,7 @@ class Otp(BaseModel):
 
 
 class Profile(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to='users/pictures', default='')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100, blank=True, null=True)
@@ -45,6 +45,13 @@ class Profile(BaseModel):
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    followers = models.ManyToManyField(User, related_name="following", blank=True)
+
+    def follower_count(self):
+        return self.followers.count()
+
+    def following_count(self):
+        return self.user.following.count()
 
     def __str__(self):
         return f'{self.user}'
