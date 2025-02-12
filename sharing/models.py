@@ -33,7 +33,7 @@ class Book(BaseModel):
     published_at = models.PositiveIntegerField()
     status = models.IntegerField(choices=BOOK_STATUS, default=1)
     isbn = models.CharField(max_length=20, blank=True, null=True)
-    owner = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
