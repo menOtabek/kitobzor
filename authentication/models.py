@@ -24,7 +24,6 @@ class User(BaseModel):
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 
-
     def __str__(self):
         return f'Bot id: {self.telegram_id}, Phone number: {self.phone_number}'
 

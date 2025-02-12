@@ -12,15 +12,6 @@ BOOK_STATUS = (
     (2, 'Inactive'),
 )
 
-RATING_CHOICES = (
-    (0, '0'),
-    (1, '1'),
-    (2, '2'),
-    (3, '3'),
-    (4, '4'),
-    (5, '5'),
-)
-
 
 class Book(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
@@ -33,6 +24,7 @@ class Book(BaseModel):
     published_at = models.PositiveIntegerField()
     status = models.IntegerField(choices=BOOK_STATUS, default=1)
     isbn = models.CharField(max_length=20, blank=True, null=True)
+    like = models.ManyToManyField(to='authentication.User', related_name='book_likes', blank=True)
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
@@ -59,25 +51,7 @@ class BookComment(BaseModel):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     comment = models.TextField()
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    like = models.ManyToManyField(to='authentication.User', blank=True, related_name='book_comment_likes')
 
     def __str__(self):
         return f'Comment to {self.book.name}'
-
-
-class BookRating(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    rating = models.PositiveIntegerField(choices=RATING_CHOICES, default=0)
-
-    def __str__(self):
-        return f'Rating: {self.rating}'
-
-
-class BookCommentRating(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    comment = models.ForeignKey(BookComment, on_delete=models.CASCADE)
-    rating = models.PositiveIntegerField(choices=RATING_CHOICES, default=0)
-
-    def __str__(self):
-        return f'Rating for comment of {self.book.name}'

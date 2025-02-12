@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'authentication',
     'blog',
     'sharing',
+    'bot'
 ]
 
 MIDDLEWARE = [
