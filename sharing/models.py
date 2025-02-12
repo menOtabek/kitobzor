@@ -30,12 +30,6 @@ class Book(BaseModel):
     def __str__(self):
         return self.name
 
-    def clean(self):
-        if self.user and self.user.role not in [1, 2]:
-            raise ValidationError('Permission denied')
-        self.owner = True
-        self.save()
-
 
 class BookPicture(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
