@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import User
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
+from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -42,8 +44,28 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         if data.get('otp_code') and (data.get('otp_code') < 100000 or data.get('otp_code') > 999999):
             raise CustomApiException(ErrorCodes.INVALID_INPUT, 'Code is invalid')
+        return data
 
 
 class OtpGenerateSerializer(serializers.Serializer):
     telegram_id = serializers.CharField(required=True)
     phone_number = serializers.CharField(required=True)
+
+
+class TokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()
+    access_token = serializers.CharField()
+    role = serializers.CharField()
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(required=True)
+
+    def validate(self, data):
+        try:
+            token = RefreshToken(data.get('refresh_token'))
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        if token.get('exp') < timezone.now().timestamp():
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, 'Refresh token is expired')
+        return data

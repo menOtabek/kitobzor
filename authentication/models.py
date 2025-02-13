@@ -1,6 +1,7 @@
 from django.db import models
 from abstract_model.base_model import BaseModel
 from base.models import Region, District
+from django.utils import timezone
 
 USER_ROLES = (
     (1, 'SuperAdmin'),
@@ -14,7 +15,7 @@ class User(BaseModel):
     telegram_id = models.CharField(max_length=77, unique=True)
     role = models.IntegerField(choices=USER_ROLES, default=4)
     is_active = models.BooleanField(default=True)
-    login_time = models.DateTimeField(null=True, blank=True)
+    login_time = models.DateTimeField(default=timezone.now().isoformat())
     otp_code = models.IntegerField(default=0)
     picture = models.ImageField(upload_to='users/pictures/', default='users/pictures/default_user.png')
     first_name = models.CharField(max_length=100, blank=True, null=True)
