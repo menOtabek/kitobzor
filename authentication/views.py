@@ -8,7 +8,7 @@ from .models import User
 from .utils import otp_generate
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserCreateSerializer, UserUpdateSerializer, OtpGenerateSerializer, LoginSerializer, TokenSerializer, RefreshTokenSerializer
+from .serializers import UserCreateSerializer, BotUserUpdateSerializer, OtpGenerateSerializer, LoginSerializer, TokenSerializer, RefreshTokenSerializer
 
 class UserViewSet(ViewSet):
     @swagger_auto_schema(
@@ -26,25 +26,25 @@ class UserViewSet(ViewSet):
         if not serializer.is_valid():
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer.save()
-        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_201_CREATED)
+        return Response(data={'success': True}, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         operation_summary="User's data update",
         operation_description="User's data update",
-        request_body=UserUpdateSerializer,
-        responses={200: UserUpdateSerializer()},
+        request_body=BotUserUpdateSerializer,
+        responses={200: BotUserUpdateSerializer()},
         tags=['User']
     )
-    def update_user_data(self, request):
+    def update_user_data(self, request): #ToDo should write new api for swagger
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
         if not user:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, message="User not found")
-        serializer = UserUpdateSerializer(instance=user, data=request.data, partial=True)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = BotUserUpdateSerializer(instance=user, data=request.data, partial=True)
         if not serializer.is_valid():
-            raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         serializer.save()
-        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+        return Response(data={'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary="Otp code generate",
@@ -57,7 +57,7 @@ class UserViewSet(ViewSet):
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
         if not user:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
+            return Response(data={'success': False}, status=status.HTTP_404_NOT_FOUND)
         otp_code = otp_generate(user)
         user.otp_code = otp_code
         user.save(update_fields=['otp_code'])

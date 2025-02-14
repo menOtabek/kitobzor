@@ -12,21 +12,17 @@ class UserCreateSerializer(serializers.ModelSerializer):
         fields = ('telegram_id',)
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
+class BotUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'telegram_id', 'phone_number', 'first_name', 'last_name',
-                  'login_time', 'region', 'district', 'otp_code', 'picture', 'latitude', 'longitude')
+        fields = ('id', 'telegram_id', 'phone_number', 'first_name', 'last_name')
 
         extra_kwargs = {
-            'telegram_id': {'required': True},
+            'id': {'read_only': True, 'required': True},
+            'telegram_id': {'required': True, 'read_only': True},
             'phone_number': {'required': False},
             'first_name': {'required': False},
             'last_name': {'required': False},
-            'otp_code': {'required': False},
-            'region': {'required': False},
-            'district': {'required': False},
-            'login_time': {'required': False},
         }
 
     def update(self, instance, validated_data):
