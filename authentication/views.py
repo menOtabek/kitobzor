@@ -8,7 +8,10 @@ from .models import User
 from .utils import otp_generate
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserCreateSerializer, BotUserUpdateSerializer, OtpGenerateSerializer, LoginSerializer, TokenSerializer, RefreshTokenSerializer
+from .serializers import (UserCreateSerializer, BotUserUpdateSerializer,
+                          OtpGenerateSerializer, LoginSerializer,
+                          TokenSerializer, RefreshTokenSerializer, UserUpdateSerializer)
+
 
 class UserViewSet(ViewSet):
     @swagger_auto_schema(
@@ -18,7 +21,7 @@ class UserViewSet(ViewSet):
         responses={201: UserCreateSerializer()},
         tags=['User']
     )
-    def register(self, request):
+    def bot_user_register(self, request):
         telegram_id = request.data.get('telegram_id')
         if User.objects.filter(telegram_id=telegram_id).exists():
             return Response(status=status.HTTP_409_CONFLICT)
@@ -35,7 +38,7 @@ class UserViewSet(ViewSet):
         responses={200: BotUserUpdateSerializer()},
         tags=['User']
     )
-    def update_user_data(self, request): #ToDo should write new api for swagger
+    def update_bot_user_data(self, request):
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
         if not user:
@@ -75,7 +78,8 @@ class UserViewSet(ViewSet):
         serializer = LoginSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
-        user = User.objects.filter(otp_code=request.data.get('otp_code'), phone_number=request.data.get('phone_number')).first()
+        user = User.objects.filter(otp_code=request.data.get('otp_code'),
+                                   phone_number=request.data.get('phone_number')).first()
         if not user:
             raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Phone number or code is invalid')
         refresh_token = RefreshToken.for_user(user)
@@ -84,7 +88,7 @@ class UserViewSet(ViewSet):
         user.login_time = login_time
         user.save(update_fields=['login_time'])
         return Response(data={'result': {'access_token': str(access_token), 'refresh_token': str(refresh_token),
-                        'role': user.role}, 'success': True}, status=status.HTTP_200_OK)
+                                         'role': user.role}, 'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary="Refresh token",
@@ -109,4 +113,24 @@ class UserViewSet(ViewSet):
         new_access_token['role'] = user.role
         user.login_time = login_time
         user.save(update_fields=['login_time'])
-        return Response(data={'result': {'refresh_token': str(new_refresh_token), 'access_token': str(new_access_token)}, 'success': True}, status=status.HTTP_200_OK)
+        return Response(
+            data={'result': {'refresh_token': str(new_refresh_token), 'access_token': str(new_access_token)},
+                  'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="User update",
+        operation_description="User update",
+        request_body=UserUpdateSerializer,
+        responses={200: UserUpdateSerializer()},
+        tags=['User']
+    )
+    def user_update(self, request):
+        print(request)
+        user = request.user
+        if not user:
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, message='User not found')
+        serializer = UserUpdateSerializer(instance=user, data=request.data, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
+        serializer.save()
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)

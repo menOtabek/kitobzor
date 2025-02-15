@@ -32,6 +32,27 @@ class BotUserUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'latitude', 'longitude')
+        extra_kwargs = {
+            'phone_number': {'required': False},
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+            'picture': {'required': False},
+            'region': {'required': False},
+            'district': {'required': False},
+            'latitude': {'required': False},
+            'longitude': {'required': False},
+        }
+
+        def update(self, instance, validated_data):
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            return instance
+
 
 class LoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True)
