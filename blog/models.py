@@ -7,7 +7,6 @@ class Post(BaseModel):
     book_author = models.CharField(max_length=100)
     title = models.CharField(max_length=777)
     like = models.ManyToManyField('authentication.User', related_name='post_likes', blank=True)
-    view_count = models.BigIntegerField(default=0)
 
     def __str__(self):
         return self.title
