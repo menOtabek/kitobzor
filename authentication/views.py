@@ -125,7 +125,6 @@ class UserViewSet(ViewSet):
         tags=['User']
     )
     def user_update(self, request):
-        print(request)
         user = request.user
         if not user:
             raise CustomApiException(ErrorCodes.INVALID_INPUT, message='User not found')
