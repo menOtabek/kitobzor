@@ -5,9 +5,9 @@ class Post(BaseModel):
     user = models.ForeignKey('authentication.User', on_delete=models.CASCADE)
     book_name = models.CharField(max_length=100)
     book_author = models.CharField(max_length=100)
-    title = models.CharField(max_length=100)
-    content = models.TextField()
+    title = models.CharField(max_length=777)
     like = models.ManyToManyField('authentication.User', related_name='post_likes', blank=True)
+    view_count = models.BigIntegerField(default=0)
 
     def __str__(self):
         return self.title
