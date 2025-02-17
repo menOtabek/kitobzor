@@ -23,6 +23,7 @@ class Book(BaseModel):
     published_at = models.PositiveIntegerField()
     status = models.IntegerField(choices=BOOK_STATUS, default=1)
     isbn = models.CharField(max_length=20, blank=True, null=True)
+    view_count = models.BigIntegerField(default=0)
     like = models.ManyToManyField(to='authentication.User', related_name='book_likes', blank=True)
     is_default = models.BooleanField(default=False)
 
