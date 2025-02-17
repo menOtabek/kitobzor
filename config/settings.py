@@ -48,14 +48,13 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'modeltranslation',
-    # 'tinymce'
+    'tinymce',
 
     # local apps
     'base',
     'authentication',
     'blog',
-    'sharing',
-    'bot'
+    'sharing'
 ]
 
 MIDDLEWARE = [
@@ -195,34 +194,34 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
-# TINYMCE_DEFAULT_CONFIG = {
-#     'height': 500,
-#     'width': '100%',
-#     'plugins': 'advlist autolink lists link image charmap preview anchor '
-#                'searchreplace visualblocks code fullscreen insertdatetime media table paste help',
-#     'toolbar': 'undo redo | styleselect | bold italic | link image media | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-#     'image_advtab': True,  # Enables advanced image options
-#     'file_picker_callback': 'function(callback, value, meta) { \
-#         if (meta.filetype === "image") { \
-#             var input = document.createElement("input"); \
-#             input.setAttribute("type", "file"); \
-#             input.setAttribute("accept", "image/*"); \
-#             input.onchange = function() { \
-#                 var file = this.files[0]; \
-#                 var reader = new FileReader(); \
-#                 reader.onload = function() { \
-#                     callback(reader.result, { alt: file.name }); \
-#                 }; \
-#                 reader.readAsDataURL(file); \
-#             }; \
-#             input.click(); \
-#         } \
-#     }',
-#     'entity_encoding': 'raw',  # Prevents encoding of special characters
-#     'valid_elements': '*[*]',  # Allows all elements and attributes (optional)
-# }
-# DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
-# FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 500,
+    'width': '100%',
+    'plugins': 'advlist autolink lists link image charmap preview anchor '
+               'searchreplace visualblocks code fullscreen insertdatetime media table paste help',
+    'toolbar': 'undo redo | styleselect | bold italic | link image media | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+    'image_advtab': True,  # Enables advanced image options
+    'file_picker_callback': 'function(callback, value, meta) { \
+        if (meta.filetype === "image") { \
+            var input = document.createElement("input"); \
+            input.setAttribute("type", "file"); \
+            input.setAttribute("accept", "image/*"); \
+            input.onchange = function() { \
+                var file = this.files[0]; \
+                var reader = new FileReader(); \
+                reader.onload = function() { \
+                    callback(reader.result, { alt: file.name }); \
+                }; \
+                reader.readAsDataURL(file); \
+            }; \
+            input.click(); \
+        } \
+    }',
+    'entity_encoding': 'raw',  # Prevents encoding of special characters
+    'valid_elements': '*[*]',  # Allows all elements and attributes (optional)
+}
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
