@@ -6,11 +6,6 @@ COVER_TYPE = (
     (2, 'Soft'),
 )
 
-BOOK_STATUS = (
-    (1, 'Active'),
-    (2, 'Inactive'),
-)
-
 
 class Book(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
@@ -21,11 +16,12 @@ class Book(BaseModel):
     price = models.PositiveIntegerField()
     pages = models.PositiveIntegerField()
     published_at = models.PositiveIntegerField()
-    status = models.IntegerField(choices=BOOK_STATUS, default=1)
     isbn = models.CharField(max_length=20, blank=True, null=True)
     view_count = models.BigIntegerField(default=0)
     like = models.ManyToManyField(to='authentication.User', related_name='book_likes', blank=True)
     is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_banned = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -46,6 +42,7 @@ class BookComment(BaseModel):
     comment = models.TextField()
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     like = models.ManyToManyField(to='authentication.User', blank=True, related_name='book_comment_likes')
+    is_banned = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Comment to {self.book.name}'

@@ -5,6 +5,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('user', 'book_name', 'book_author', 'title')
+        extra_kwargs = {'user': {'required': False}}
 
 
 class PostCommentCreateSerializer(serializers.ModelSerializer):
@@ -40,13 +41,13 @@ class PostCommentListSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    comments = serializers.SerializerMethodField(source='post_comments', many=True, read_only=True)
-    like_count = serializers.IntegerField(source='like_count', read_only=True)
+    comments = serializers.SerializerMethodField()
+    like_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = Post
-        fields = ('id', 'user', 'book_name', 'book_author', 'title', 'like', 'like_count')
+        fields = ('id', 'user', 'book_name', 'book_author', 'title', 'like', 'like_count', 'comments')
         read_only_fields = ('id', 'user', 'like')
 
-    def get_post_comments(self, obj):
+    def get_comments(self, obj):
         comments = PostComment.objects.filter(post=obj)
         return PostCommentListSerializer(comments, many=True).data
