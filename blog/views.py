@@ -154,3 +154,5 @@ class PostCommentViewSet(viewsets.ViewSet):
         else:
             comment.like.remove(user)
         return Response(data={'result': not comment_liked, 'success': True}, status=status.HTTP_200_OK)
+
+# create serializer for detail
