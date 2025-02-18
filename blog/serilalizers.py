@@ -75,7 +75,7 @@ class PostListSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'user',)
 
     def get_comments(self, obj):
-        comments = PostComment.objects.filter(post=obj)
+        comments = PostComment.objects.filter(post=obj, is_banned=False)
         return PostCommentListSerializer(comments, many=True, context=self.context).data
 
     def get_is_liked(self, obj):
