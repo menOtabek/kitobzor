@@ -1,17 +1,20 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 from .models import Post, PostComment
-from .serilalizers import (PostListSerializer,
-                           PostCreateSerializer,
-                           PostUpdateSerializer,
-                           PostCreateSwaggerRequestSerializer,
-                           PostUpdateSwaggerRequestSerializer,
-                           PostCommentCreateSerializer,
-                           PostCommentSwaggerRequestSerializer)
+from .serilalizers import (
+    PostListSerializer,
+    PostCreateSerializer,
+    PostUpdateSerializer,
+    PostDetailSerializer,
+    PostCreateSwaggerRequestSerializer,
+    PostUpdateSwaggerRequestSerializer,
+    PostCommentCreateSerializer,
+    PostCommentSwaggerRequestSerializer
+)
+
 
 class PostViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
@@ -60,7 +63,7 @@ class PostViewSet(viewsets.ViewSet):
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
         post.is_banned = True
         post.save(update_fields=['is_banned'])
-        return Response(data={'result': 'Post deleted successfully', 'success': True,}, status=status.HTTP_200_OK)
+        return Response(data={'result': 'Post deleted successfully', 'success': True, }, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='Posts list',
@@ -76,14 +79,14 @@ class PostViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         operation_summary='Posts detail',
         operation_description='Detail of a post',
-        responses={200: PostListSerializer()},
+        responses={200: PostDetailSerializer()},
         tags=['Posts']
     )
     def post_detail(self, request, pk=None):
         post = Post.objects.filter(pk=pk, is_active=True, is_banned=False).first()
         if not post:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
-        serializer = PostListSerializer(instance=post, context={'request': request})
+        serializer = PostDetailSerializer(instance=post, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -154,5 +157,3 @@ class PostCommentViewSet(viewsets.ViewSet):
         else:
             comment.like.remove(user)
         return Response(data={'result': not comment_liked, 'success': True}, status=status.HTTP_200_OK)
-
-# create serializer for detail
