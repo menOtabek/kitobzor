@@ -1,14 +1,20 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Q
+from .paginators.posts_list_paginator import paginate_posts
 from .models import Post, PostComment
 from .serilalizers import (
     PostListSerializer,
     PostCreateSerializer,
     PostUpdateSerializer,
     PostDetailSerializer,
+    PostParamValidateSerializer,
     PostCreateSwaggerRequestSerializer,
     PostUpdateSwaggerRequestSerializer,
     PostCommentCreateSerializer,
@@ -66,15 +72,43 @@ class PostViewSet(viewsets.ViewSet):
         return Response(data={'result': 'Post deleted successfully', 'success': True, }, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'page_number', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page number'),
+            openapi.Parameter(
+                'page_size', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page size'),
+            openapi.Parameter(
+                'is_popular', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN, description='Is popular'),
+            openapi.Parameter(
+                'q', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Search query')
+        ],
         operation_summary='Posts list',
         operation_description='List of posts',
         responses={200: PostListSerializer(many=True)},
         tags=['Posts']
     )
     def post_list(self, request):
-        posts = Post.objects.filter(is_active=True, is_banned=False)
-        serializer = PostListSerializer(instance=posts, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+        param_serializer = PostParamValidateSerializer(data=request.query_params)
+        if not param_serializer.is_valid():
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, message=param_serializer.errors)
+        params = param_serializer.validated_data
+        posts_filter = Q()
+        if params.get('q'):
+            query = params.get('q')
+            posts_filter &= Q(title__icontains=query) | Q(book_name__icontains=query) | Q(book_author__icontains=query)
+        if params.get('is_popular') is True:
+            three_days_ago = timezone.now() - timedelta(days=3)
+
+            post_query = Post.objects.filter(created_at__gte=three_days_ago, is_active=True,
+                                              is_banned=False).order_by('-like')
+        else:
+            post_query = Post.objects.filter(is_active=True,
+                            is_banned=False).filter(posts_filter).order_by('-created_at__day', '-like').distinct()
+
+        posts = paginate_posts(post_query, context={'request': request}, page_size=params.get('page_size'),
+                               page_number=params.get('page_number'))
+
+        return Response(data={'result': posts, 'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='Posts detail',
