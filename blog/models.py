@@ -22,6 +22,7 @@ class PostComment(BaseModel):
     user = models.ForeignKey('authentication.User', on_delete=models.CASCADE)
     comment = models.TextField()
     like = models.ManyToManyField('authentication.User', related_name='post_comment_likes', blank=True)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, related_name="replies", null=True, blank=True)
     is_banned = models.BooleanField(default=False)
 
     def __str__(self):
@@ -29,3 +30,6 @@ class PostComment(BaseModel):
 
     def comment_like_count(self):
         return self.like.count()
+
+    def replies_count(self):
+        return self.replies.count()

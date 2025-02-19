@@ -35,7 +35,7 @@ class BotUserUpdateSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'latitude', 'longitude')
+        fields = ('phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'location')
         extra_kwargs = {
             'phone_number': {'required': False},
             'first_name': {'required': False},
@@ -43,8 +43,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'picture': {'required': False},
             'region': {'required': False},
             'district': {'required': False},
-            'latitude': {'required': False},
-            'longitude': {'required': False},
+            'location': {'required': False}
         }
 
     def update(self, instance, validated_data):
