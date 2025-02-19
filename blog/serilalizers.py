@@ -18,7 +18,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
 class PostCommentSwaggerRequestSerializer(serializers.Serializer):
     comment = serializers.CharField(required=True)
-    parent = serializers.IntegerField(required=True)
+    parent = serializers.IntegerField(required=False)
 
 
 class PostCommentCreateSerializer(serializers.ModelSerializer):
