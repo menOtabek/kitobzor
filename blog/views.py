@@ -95,15 +95,15 @@ class PostViewSet(viewsets.ViewSet):
         posts_filter = Q()
         if params.get('q'):
             query = params.get('q')
-            posts_filter &= Q(title__icontains=query) | Q(book_name__icontains=query) | Q(book_author__icontains=query)
+            posts_filter = Q(title__icontains=query) | Q(book_name__icontains=query) | Q(book_author__icontains=query)
         if params.get('is_popular') is True:
             three_days_ago = timezone.now() - timedelta(days=3)
 
             post_query = Post.objects.filter(created_at__gte=three_days_ago, is_active=True,
-                                              is_banned=False).order_by('-like')
+                                              is_banned=False).order_by('-like', '-created_at').distinct()
         else:
-            post_query = Post.objects.filter(is_active=True,
-                            is_banned=False).filter(posts_filter).order_by('-created_at__day', '-like').distinct()
+            post_query = Post.objects.filter(posts_filter, is_active=True,
+                            is_banned=False).order_by('-created_at__day', '-like').distinct()
 
         posts = paginate_posts(post_query, context={'request': request}, page_size=params.get('page_size'),
                                page_number=params.get('page_number'))
