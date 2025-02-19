@@ -29,9 +29,11 @@ class PostCommentCreateSerializer(serializers.ModelSerializer):
             'parent': {'required': False},
         }
     def validate(self, attrs):
-        post_comment = PostComment.objects.filter(pk=attrs['parent'].id).first()
-        if attrs['post'].id != post_comment.post.id:
-            raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Post id and parent id do not match')
+        if 'parent' in attrs:
+            post_comment = PostComment.objects.filter(pk=attrs['parent'].id).first()
+            if attrs['post'].id != post_comment.post.id:
+                raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Post id and parent id do not match')
+            return attrs
         return attrs
 
 
