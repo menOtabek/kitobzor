@@ -8,37 +8,40 @@ COVER_TYPE = (
 
 
 class Book(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
+    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='book_user')
+    picture = models.ImageField(upload_to='books/pictures/')
     name = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     author = models.CharField(max_length=150)
     cover_type = models.IntegerField(choices=COVER_TYPE)
     price = models.PositiveIntegerField()
     pages = models.PositiveIntegerField()
-    published_at = models.PositiveIntegerField()
+    publication_year = models.PositiveIntegerField()
     isbn = models.CharField(max_length=20, blank=True, null=True)
-    view_count = models.BigIntegerField(default=0)
+    views = models.ManyToManyField(to='authentication.User', related_name='book_views_count', blank=True)
     like = models.ManyToManyField(to='authentication.User', related_name='book_likes', blank=True)
-    is_default = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_banned = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
 
+    @property
+    def views_count(self):
+        return self.views.count()
 
-class BookPicture(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    picture = models.ImageField()
+    @property
+    def likes_count(self):
+        return self.like.count()
 
-    def __str__(self):
-        return f'Picture for {self.book.name}'
+    @property
+    def comments_count(self):
+        return self.book_comments.count()
 
 
 class BookComment(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_comments')
     comment = models.TextField()
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     like = models.ManyToManyField(to='authentication.User', blank=True, related_name='book_comment_likes')
@@ -46,3 +49,11 @@ class BookComment(BaseModel):
 
     def __str__(self):
         return f'Comment to {self.book.name}'
+
+    @property
+    def likes_count(self):
+        return self.like.count()
+
+    @property
+    def replies_count(self):
+        return self.replies.count()

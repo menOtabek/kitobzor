@@ -42,10 +42,10 @@ class PostCommentCreateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        if 'parent' in attrs:
+        if attrs.get('parent'):
             post_comment = PostComment.objects.filter(pk=attrs['parent'].id).first()
             if attrs['post'].id != post_comment.post.id:
-                raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Post id and parent id do not match')
+                raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Post id and comment id do not match')
             return attrs
         return attrs
 
@@ -97,7 +97,7 @@ class PostCommentListSerializer(serializers.ModelSerializer):
 class PostListSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
-    is_liked = serializers.SerializerMethodField()
+    is_liked = serializers.BooleanField(read_only=True, default=False)
 
     class Meta:
         model = Post
