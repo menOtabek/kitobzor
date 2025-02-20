@@ -1,6 +1,7 @@
 from django.db import models
 from abstract_model.base_model import BaseModel
 
+
 class Region(BaseModel):
     name = models.CharField(max_length=100)
 
@@ -15,10 +16,11 @@ class District(BaseModel):
     def __str__(self):
         return self.name
 
-class DefaultBookOffer(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE)
-    book_name = models.CharField(max_length=150)
-    book_author = models.CharField(max_length=150)
+
+class Banner(BaseModel):
+    picture = models.ImageField(upload_to="banner/pictures/")
+    title = models.CharField(max_length=200, blank=True, null=True)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'Offer for {self.book_name}'
+        return self.title

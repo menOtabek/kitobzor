@@ -2,12 +2,9 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
-from exceptions.exception import CustomApiException
-from exceptions.error_messages import ErrorCodes
-from .models import District, Region, DefaultBookOffer
-from .serializers import (
-    DistrictSerializer, RegionSerializer,
-    DefaultBookOfferCreateSerializer, DefaultBookOfferSerializer)
+from .models import District, Region, Banner
+from .serializers import (DistrictSerializer, RegionSerializer, BannerSerializer)
+
 
 class RegionViewSet(ViewSet):
     @swagger_auto_schema(
@@ -35,30 +32,14 @@ class DistrictViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
 
-class DefaultBookOfferViewSet(ViewSet):
-    # ToDo authentication must be required
+class BannerViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Book offer create',
-        operation_description='Create book offer',
-        request_body=DefaultBookOfferCreateSerializer,
-        tags=['BookOffer']
+        operation_summary='Banner list',
+        operation_description='List of banners',
+        responses={200: BannerSerializer(many=True)},
+        tags=['Banner']
     )
-    def create_offer(self, request):
-        serializer = DefaultBookOfferCreateSerializer(data=request.data)
-        if not serializer.is_valid():
-            return CustomApiException(ErrorCodes.INVALID_INPUT, message=serializer.errors)
-        serializer.save()
-        return Response(data={'result': 'Request sent to admins', 'success': True}, status=status.HTTP_201_CREATED)
-
-    # ToDo authentication must be required
-    @swagger_auto_schema(
-        operation_summary='Book offer list',
-        operation_description='List of book offers',
-        responses={status.HTTP_200_OK: DistrictSerializer(many=True)},
-        tags=['BookOffer']
-    )
-    def get_offer(self, request):
-        user = request.user
-        book_offers = DefaultBookOffer.objects.filter(user_id=user.id)
-        serializer = DefaultBookOfferSerializer(book_offers, many=True, context={'request': request})
+    def get_banners(self, request):
+        banners = Banner.objects.filter(is_active=True).order_by('-created_at')[:7]
+        serializer = BannerSerializer(banners, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
