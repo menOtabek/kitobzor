@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Region, District, DefaultBookOffer
+from .models import Region, District, Banner
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
@@ -15,8 +15,7 @@ class DistrictAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-@admin.register(DefaultBookOffer)
-class DefaultBookOfferAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'book_name')
-    list_display_links = ('id', 'book_name')
-    search_fields = ('book_name', 'book_author')
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'is_active', 'title')
+    list_display_links = ('id', 'title')

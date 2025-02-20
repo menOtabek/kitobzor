@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DefaultBookOffer, Region, District
+from .models import Banner, Region, District
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -13,13 +13,8 @@ class DistrictSerializer(serializers.ModelSerializer):
         model = District
         fields = ('id', 'name', 'region')
 
-class DefaultBookOfferCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DefaultBookOffer
-        fields = ('user', 'book_name', 'book_author')
 
-
-class DefaultBookOfferSerializer(serializers.ModelSerializer):
+class BannerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DefaultBookOffer
-        fields = ('id', 'user', 'book_name', 'book_author')
+        model = Banner
+        fields = ('id', 'title', 'image')
