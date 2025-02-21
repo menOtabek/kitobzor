@@ -4,13 +4,16 @@ from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 
 
-class PostParamValidateSerializer(serializers.Serializer):
+class BookParamValidateSerializer(serializers.Serializer):
     page_number = serializers.IntegerField(required=False, default=1)
-    page_size = serializers.IntegerField(required=False, default=10)
+    page_size = serializers.IntegerField(required=False, default=20)
     is_popular = serializers.BooleanField(required=False, default=False)
     q = serializers.CharField(required=False, default='')
     by_price = serializers.BooleanField(required=False, default=False)
     by_location = serializers.BooleanField(required=False, default=False)
+    region_id = serializers.IntegerField(required=False)
+    district_id = serializers.IntegerField(required=False)
+    is_shop = serializers.BooleanField(required=True)
 
     def validate(self, attrs):
         if attrs.get('page_number') < 1 or attrs.get('page_size') < 1:
@@ -88,7 +91,7 @@ class BookUpdateSerializer(serializers.ModelSerializer):
 class BookListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year', 'is_liked')
+        fields = ('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year', 'is_liked', 'created_at', 'updated_at')
 
 
 class BookCommentSwaggerSerializer(serializers.Serializer):
@@ -120,7 +123,7 @@ class BookCommentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BookComment
-        fields = ('id', 'user', 'book', 'comment', 'parent', 'likes_count', 'replies_count', 'is_liked')
+        fields = ('id', 'user', 'book', 'comment', 'parent', 'likes_count', 'replies_count', 'is_liked', 'created_at')
 
     def get_is_liked(self, obj):
         user = self.context['request'].user
@@ -139,7 +142,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ('id', 'user', 'picture', 'name', 'description', 'author', 'cover_type', 'price', 'pages', 'is_active',
-                  'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'comments')
+                  'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'comments', 'created_at', 'updated_at')
 
     def get_comments(self, obj):
         comments = BookComment.objects.filter(book=obj, is_banned=False)

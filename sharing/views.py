@@ -1,0 +1,165 @@
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from exceptions.exception import CustomApiException
+from exceptions.error_messages import ErrorCodes
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Q
+from paginators.books_list_paginator import paginate_books
+from .models import Book, BookComment
+from .serializers import (
+    BookParamValidateSerializer, BookSwaggerSerializer,
+    BookCreateSerializer, BookUpdateSerializer,
+    BookListSerializer, BookDetailSerializer,
+    BookUpdateSerializer, BookCommentCreateSerializer,
+    BookCommentListSerializer, BookCommentSwaggerSerializer)
+
+
+class BookViewSet(viewsets.ViewSet):
+    @swagger_auto_schema(
+        operation_summary="Book create",
+        operation_description="Create a new book",
+        request_body=BookCreateSerializer,
+        responses={status.HTTP_201_CREATED: BookCreateSerializer()},
+        tags=["Books"]
+    )
+    def create_a_book(self, request):
+        data = request.data
+        data['user'] = request.user.id
+        serializer = BookCreateSerializer(data=data, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
+        serializer.save()
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_summary="Book update",
+        operation_description="Update a book",
+        request_body=BookUpdateSerializer,
+        responses={status.HTTP_200_OK: BookUpdateSerializer()},
+    )
+    def update_a_book(self, request, pk):
+        data = request.data
+        data['user'] = request.user.id
+        book = Book.objects.filter(pk=pk, user_id=request.user.id, is_banned=False).first()
+        if not book:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
+        serializer = BookUpdateSerializer(instance=book, data=request.data, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
+        serializer.save()
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Book details",
+        operation_description="Get a book",
+        responses={status.HTTP_200_OK: BookDetailSerializer()},
+        tags=["Books"]
+    )
+    def get_a_book(self, request, pk):
+        book = Book.objects.filter(pk=pk, is_banned=False).first()
+        if not book:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
+        serializer = BookDetailSerializer(request.data, context={'request': request})
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Book delete",
+        operation_description="Delete a book",
+        tags=["Books"]
+    )
+    def delete_a_book(self, request, pk):
+        book = Book.objects.filter(pk=pk, user_id=request.user.id, is_banned=False).first()
+        if not book:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
+        book.is_banned = True
+        book.save(update_fields=['is_banned'])
+        return Response(data={'result': 'Book deleted successfully', 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'page_number', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page number'),
+            openapi.Parameter(
+                'page_size', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page size'),
+            openapi.Parameter(
+                'is_popular', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN, description='Is popular'),
+            openapi.Parameter(
+                'q', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Search query'),
+            openapi.Parameter(
+                'by_price', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN, description='By price'),
+            openapi.Parameter(
+                'by_location', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN, description='By location'),
+            openapi.Parameter(
+                'region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='In region'),
+            openapi.Parameter(
+                'district_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='In district'),
+            openapi.Parameter(
+                'is_shop', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN, description='Is shop')
+        ],
+        operation_summary="Books list",
+        operation_description="Get list of books",
+        responses={status.HTTP_200_OK: BookListSerializer()},
+        tags=["Books"]
+    )
+    def books_list(self, request):
+        query_serializer = BookParamValidateSerializer(data=request.query_params)
+        if not query_serializer.is_valid():
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, query_serializer.errors)
+        book_filter = Q()
+        query = query_serializer.validated_data
+
+        if query.get('q'):
+            book_filter &= Q(name__icontains=query.get('q')) | Q(author__icontains=query.get('q'))
+        if query.get('region_id'):
+            book_filter &= Q(region_id=query.get('region_id'))
+        if query.get('district_id'):
+            book_filter &= Q(district_id=query.get('district_id'))
+
+        if query.get('is_shop') is True:
+            if query.get('is_popular') is True:
+                three_days_ago = timezone.now() - timedelta(days=3)
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
+                            'is_liked', 'created_at', 'updated_at').filter(user__role=3, created_at__gte=three_days_ago, is_active=True,
+                            is_banned=False).order_by('-like', '-created_at').distinct()
+
+            elif query.get('by_location') is True:
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
+                            'is_liked', 'created_at', 'updated_at').filter(book_filter, user__role=3, is_active=True,
+                            is_banned=False).order_by('-like').distinct()
+
+            elif query.get('by_price') is True:
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
+                            'is_liked', 'created_at', 'updated_at').filter(book_filter, user__role=3, is_active=True,
+                            is_banned=False).order_by('-price').distinct()
+            else:
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
+                            'is_liked', 'created_at', 'updated_at').filter(book_filter, user__role=3, is_active=True, is_banned=False)
+            books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
+                                   page_number=query.get('page_number'))
+        else:
+            if query.get('is_popular') is True:
+                three_days_ago = timezone.now() - timedelta(days=3)
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
+                                created_at__gte=three_days_ago, is_active=True,
+                                is_banned=False).order_by('-like', '-created_at').distinct()
+
+            elif query.get('by_location') is True:
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(book_filter,
+                                is_active=True, is_banned=False).order_by('-like').distinct()
+
+            elif query.get('by_price') is True:
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(book_filter,
+                                is_active=True, is_banned=False).order_by('-price').distinct()
+            else:
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(book_filter,
+                                is_active=True, is_banned=False)
+            books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
+                                   page_number=query.get('page_number'))
+        return Response(data={'result': books, 'success': True}, status=status.HTTP_200_OK)
