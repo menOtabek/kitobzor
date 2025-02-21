@@ -85,7 +85,7 @@ class PostCommentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostComment
-        fields = ('id', 'user', 'post', 'comment', 'comment_like_count', 'is_comment_liked', 'parent', 'replies_count')
+        fields = ('id', 'user', 'post', 'comment', 'comment_like_count', 'is_comment_liked', 'parent', 'replies_count', 'created_at')
 
     def get_is_comment_liked(self, obj):
         user = self.context['request'].user
@@ -101,7 +101,7 @@ class PostListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'user', 'book_name', 'book_author', 'title', 'is_liked', 'like_count', 'comments_count')
+        fields = ('id', 'user', 'book_name', 'book_author', 'title', 'is_liked', 'like_count', 'comments_count', 'created_at', 'updated_at')
         read_only_fields = ('id', 'user')
 
     def get_is_liked(self, obj):
@@ -120,7 +120,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'user', 'book_name', 'book_author', 'title', 'is_liked',
-                  'like_count', 'is_active', 'comments', 'description', 'comments_count')
+                  'like_count', 'is_active', 'comments', 'description', 'comments_count', 'created_at', 'updated_at')
         read_only_fields = ('id', 'user')
 
     def get_comments(self, obj):
