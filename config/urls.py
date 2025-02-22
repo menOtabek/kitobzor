@@ -28,7 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('authentication.urls')),
     path('api/v1/', include('base.urls')),
-    path('api/v1/sharing/', include('sharing.urls')),
+    path('api/v1/book/', include('sharing.urls')),
     path('api/v1/post/', include('blog.urls')),
 
 

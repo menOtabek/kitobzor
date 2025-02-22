@@ -139,64 +139,49 @@ class BookViewSet(viewsets.ViewSet):
         if query.get('is_shop') is True:
             if query.get('is_popular') is True:
                 three_days_ago = timezone.now() - timedelta(days=3)
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year',
-                                                'is_liked', 'created_at', 'updated_at').filter(user__role=3,
-                                                                                               created_at__gte=three_days_ago,
-                                                                                               is_active=True,
-                                                                                               is_banned=False).order_by(
-                    '-like', '-created_at').distinct()
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages', 'publication_year',
+                                                'created_at', 'updated_at').filter(
+                    user__role=3, created_at__gte=three_days_ago, is_active=True, is_banned=False
+                                                ).order_by('-like', '-created_at').distinct()
 
             elif query.get('by_location') is True:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year',
-                                                'is_liked', 'created_at', 'updated_at').filter(book_filter,
-                                                                                               user__role=3,
-                                                                                               is_active=True,
-                                                                                               is_banned=False).order_by(
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages', 'publication_year',
+                                                'created_at', 'updated_at').filter(
+                    book_filter, user__role=3, is_active=True, s_banned=False).order_by(
                     '-like').distinct()
 
             elif query.get('by_price') is True:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year',
-                                                'is_liked', 'created_at', 'updated_at').filter(book_filter,
-                                                                                               user__role=3,
-                                                                                               is_active=True,
-                                                                                               is_banned=False).order_by(
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
+                                                'publication_year', 'created_at', 'updated_at').filter(
+                    book_filter, user__role=3, is_active=True, is_banned=False).order_by(
                     '-price').distinct()
             else:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year',
-                                                'is_liked', 'created_at', 'updated_at').filter(book_filter,
-                                                                                               user__role=3,
-                                                                                               is_active=True,
-                                                                                               is_banned=False)
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
+                                                'publication_year', 'created_at', 'updated_at').filter(
+                    book_filter,  user__role=3, is_active=True, is_banned=False).order_by('-views_count').distinct()
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         else:
             if query.get('is_popular') is True:
                 three_days_ago = timezone.now() - timedelta(days=3)
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
+                                                'publication_year', 'created_at', 'updated_at').filter(
                     created_at__gte=three_days_ago, is_active=True,
                     is_banned=False).order_by('-like', '-created_at').distinct()
 
             elif query.get('by_location') is True:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
-                    book_filter,
-                    is_active=True, is_banned=False).order_by('-like').distinct()
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
+                                                'publication_year', 'created_at', 'updated_at').filter(
+                    book_filter, is_active=True, is_banned=False).order_by('-like').distinct()
 
             elif query.get('by_price') is True:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
-                    book_filter,
-                    is_active=True, is_banned=False).order_by('-price').distinct()
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
+                                                'publication_year', 'created_at', 'updated_at').filter(
+                    book_filter, is_active=True, is_banned=False).order_by('-price').distinct()
             else:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
-                    book_filter,
-                    is_active=True, is_banned=False)
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
+                                                'publication_year', 'created_at', 'updated_at').filter(
+                    book_filter, is_active=True, is_banned=False).order_by('-views_count').distinct()
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         return Response(data={'result': books, 'success': True}, status=status.HTTP_200_OK)
