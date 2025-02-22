@@ -17,4 +17,4 @@ class DistrictSerializer(serializers.ModelSerializer):
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'image')
+        fields = ('id', 'title', 'picture')

@@ -89,9 +89,16 @@ class BookUpdateSerializer(serializers.ModelSerializer):
 
 
 class BookListSerializer(serializers.ModelSerializer):
+    is_liked = serializers.BooleanField(read_only=True, default=False)
     class Meta:
         model = Book
         fields = ('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year', 'is_liked', 'created_at', 'updated_at')
+
+    def get_is_liked(self, obj):
+        user = self.context['request'].user
+        if obj.like.filter(id=user.id).exists():
+            return True
+        return False
 
 
 class BookCommentSwaggerSerializer(serializers.Serializer):

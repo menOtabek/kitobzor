@@ -120,7 +120,7 @@ class PostViewSet(viewsets.ViewSet):
         post = Post.objects.filter(pk=pk, is_active=True, is_banned=False).first()
         if not post:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
-        serializer = PostDetailSerializer(instance=post, context={'request': request})
+        serializer = PostDetailSerializer(post, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -181,13 +181,13 @@ class PostCommentViewSet(viewsets.ViewSet):
         tags=['PostComments']
     )
     def post_comment_like(self, request, pk=None):
-        user = request.user
-        comment = PostComment.objects.filter(pk=pk, is_banned=False).first()
-        comment_liked = comment.like.filter(id=user.id).exists()
-        if not comment:
+        post_comment = PostComment.objects.filter(pk=pk, is_banned=False).first()
+        if not post_comment:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Comment not found')
+        user = request.user
+        comment_liked = post_comment.like.filter(id=user.id).exists()
         if not comment_liked:
-            comment.like.add(user)
+            post_comment.like.add(user)
         else:
-            comment.like.remove(user)
+            post_comment.like.remove(user)
         return Response(data={'result': not comment_liked, 'success': True}, status=status.HTTP_200_OK)
