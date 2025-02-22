@@ -7,21 +7,21 @@ from exceptions.error_messages import ErrorCodes
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
-from paginators.books_list_paginator import paginate_books
+from .paginators.books_list_paginator import paginate_books
 from .models import Book, BookComment
 from .serializers import (
     BookParamValidateSerializer, BookSwaggerSerializer,
     BookCreateSerializer, BookUpdateSerializer,
     BookListSerializer, BookDetailSerializer,
-    BookUpdateSerializer, BookCommentCreateSerializer,
-    BookCommentListSerializer, BookCommentSwaggerSerializer)
+    BookCommentCreateSerializer, BookCommentListSerializer,
+    BookCommentSwaggerSerializer)
 
 
 class BookViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         operation_summary="Book create",
         operation_description="Create a new book",
-        request_body=BookCreateSerializer,
+        request_body=BookSwaggerSerializer,
         responses={status.HTTP_201_CREATED: BookCreateSerializer()},
         tags=["Books"]
     )
@@ -39,6 +39,7 @@ class BookViewSet(viewsets.ViewSet):
         operation_description="Update a book",
         request_body=BookUpdateSerializer,
         responses={status.HTTP_200_OK: BookUpdateSerializer()},
+        tags=["Books"]
     )
     def update_a_book(self, request, pk):
         data = request.data
@@ -62,7 +63,7 @@ class BookViewSet(viewsets.ViewSet):
         book = Book.objects.filter(pk=pk, is_banned=False).first()
         if not book:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
-        serializer = BookDetailSerializer(request.data, context={'request': request})
+        serializer = BookDetailSerializer(book, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -77,6 +78,23 @@ class BookViewSet(viewsets.ViewSet):
         book.is_banned = True
         book.save(update_fields=['is_banned'])
         return Response(data={'result': 'Book deleted successfully', 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Book like | dislike",
+        operation_description="Like or dislike a book",
+        tags=["Books"]
+    )
+    def like_a_book(self, request, pk):
+        book = Book.objects.filter(pk=pk, is_banned=False).first()
+        if not book:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
+        user = request.user
+        liked_book = book.like.filter(id=user.id).exists()
+        if not liked_book:
+            book.like.add(user)
+        else:
+            book.like.remove(user)
+        return Response(data={'result': not liked_book, 'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -121,45 +139,117 @@ class BookViewSet(viewsets.ViewSet):
         if query.get('is_shop') is True:
             if query.get('is_popular') is True:
                 three_days_ago = timezone.now() - timedelta(days=3)
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
-                            'is_liked', 'created_at', 'updated_at').filter(user__role=3, created_at__gte=three_days_ago, is_active=True,
-                            is_banned=False).order_by('-like', '-created_at').distinct()
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                                'publication_year',
+                                                'is_liked', 'created_at', 'updated_at').filter(user__role=3,
+                                                                                               created_at__gte=three_days_ago,
+                                                                                               is_active=True,
+                                                                                               is_banned=False).order_by(
+                    '-like', '-created_at').distinct()
 
             elif query.get('by_location') is True:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
-                            'is_liked', 'created_at', 'updated_at').filter(book_filter, user__role=3, is_active=True,
-                            is_banned=False).order_by('-like').distinct()
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                                'publication_year',
+                                                'is_liked', 'created_at', 'updated_at').filter(book_filter,
+                                                                                               user__role=3,
+                                                                                               is_active=True,
+                                                                                               is_banned=False).order_by(
+                    '-like').distinct()
 
             elif query.get('by_price') is True:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
-                            'is_liked', 'created_at', 'updated_at').filter(book_filter, user__role=3, is_active=True,
-                            is_banned=False).order_by('-price').distinct()
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                                'publication_year',
+                                                'is_liked', 'created_at', 'updated_at').filter(book_filter,
+                                                                                               user__role=3,
+                                                                                               is_active=True,
+                                                                                               is_banned=False).order_by(
+                    '-price').distinct()
             else:
-                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year',
-                            'is_liked', 'created_at', 'updated_at').filter(book_filter, user__role=3, is_active=True, is_banned=False)
+                books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
+                                                'publication_year',
+                                                'is_liked', 'created_at', 'updated_at').filter(book_filter,
+                                                                                               user__role=3,
+                                                                                               is_active=True,
+                                                                                               is_banned=False)
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         else:
             if query.get('is_popular') is True:
                 three_days_ago = timezone.now() - timedelta(days=3)
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
-                                created_at__gte=three_days_ago, is_active=True,
-                                is_banned=False).order_by('-like', '-created_at').distinct()
+                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
+                    created_at__gte=three_days_ago, is_active=True,
+                    is_banned=False).order_by('-like', '-created_at').distinct()
 
             elif query.get('by_location') is True:
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(book_filter,
-                                is_active=True, is_banned=False).order_by('-like').distinct()
+                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
+                    book_filter,
+                    is_active=True, is_banned=False).order_by('-like').distinct()
 
             elif query.get('by_price') is True:
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(book_filter,
-                                is_active=True, is_banned=False).order_by('-price').distinct()
+                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
+                    book_filter,
+                    is_active=True, is_banned=False).order_by('-price').distinct()
             else:
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'likes_count', 'pages',
-                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(book_filter,
-                                is_active=True, is_banned=False)
+                                                'publication_year', 'is_liked', 'created_at', 'updated_at').filter(
+                    book_filter,
+                    is_active=True, is_banned=False)
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         return Response(data={'result': books, 'success': True}, status=status.HTTP_200_OK)
+
+
+class BookCommentViewSet(viewsets.ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Book comment create',
+        operation_description='Create a new book comment',
+        request_body=BookCommentSwaggerSerializer,
+        responses={status.HTTP_201_CREATED: BookCommentListSerializer()},
+        tags=['Book Comment']
+    )
+    def create_a_book_comment(self, request, pk):
+        book = Book.objects.filter(pk=pk, is_active=True, is_banned=False).first()
+        if not book:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, 'Book not found')
+        data = request.data
+        data['user'] = request.user.id
+        data['book'] = book.id
+        serializer = BookCommentCreateSerializer(data, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, message=serializer.errors)
+        serializer.save()
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_summary='Book comment delete',
+        operation_description='Delete a book comment',
+        tags=['Book Comment']
+    )
+    def delete_a_book_comment(self, request, pk):
+        user = request.user
+        comment = BookComment.objects.filter(pk=pk, user=user, is_active=True, is_banned=False).first()
+        if not comment:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Comment not found')
+        comment.is_banned = True
+        comment.save(update_fields=['is_banned'])
+        return Response(data={'result': 'Comment deleted successfully', 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Book comment like | dislike',
+        operation_description='Like or dislike a book comment',
+        tags=['Book Comment']
+    )
+    def like_a_book_comment(self, request, pk=None):
+        book_comment = BookComment.objects.filter(pk=pk, is_banned=False).first()
+        if not book_comment:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Comment not found')
+        user = request.user
+        liked_comment = book_comment.like.filter(id=user.id).exists()
+        if liked_comment:
+            book_comment.like.remove(user)
+        else:
+            book_comment.like.add(user)
+        return Response(data={'result': not liked_comment, 'success': True}, status=status.HTTP_200_OK)
