@@ -97,7 +97,7 @@ class PostCommentListSerializer(serializers.ModelSerializer):
 class PostListSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
-    is_liked = serializers.BooleanField(read_only=True, default=False)
+    is_liked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post

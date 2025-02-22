@@ -89,10 +89,14 @@ class BookUpdateSerializer(serializers.ModelSerializer):
 
 
 class BookListSerializer(serializers.ModelSerializer):
-    is_liked = serializers.BooleanField(read_only=True, default=False)
+    is_liked = serializers.SerializerMethodField()
+    likes_count = serializers.IntegerField(read_only=True)
+    views_count = serializers.IntegerField(read_only=True)
+    comments_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = Book
-        fields = ('id', 'name', 'author', 'price', 'likes_count', 'pages', 'publication_year', 'is_liked', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'author', 'price', 'likes_count', 'views_count', 'pages', 'comments_count',
+                  'publication_year', 'is_liked', 'created_at', 'updated_at')
 
     def get_is_liked(self, obj):
         user = self.context['request'].user
@@ -126,7 +130,7 @@ class BookCommentCreateSerializer(serializers.ModelSerializer):
 class BookCommentListSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(read_only=True)
     replies_count = serializers.IntegerField(read_only=True)
-    is_liked = serializers.BooleanField(read_only=True, default=False)
+    is_liked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = BookComment
@@ -143,7 +147,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(read_only=True)
     views_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
-    is_liked = serializers.BooleanField(read_only=True, default=False)
+    is_liked = serializers.SerializerMethodField(read_only=True)
     comments = serializers.SerializerMethodField()
 
     class Meta:
