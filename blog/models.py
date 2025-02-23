@@ -2,6 +2,7 @@ from django.db import models
 from abstract_model.base_model import BaseModel
 from tinymce.models import HTMLField
 
+
 class Post(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='post_user')
     book_name = models.CharField(max_length=200, blank=True, null=True, db_index=True)
@@ -15,6 +16,7 @@ class Post(BaseModel):
 
     def __str__(self):
         return self.title
+
     @property
     def like_count(self):
         return self.like.count()

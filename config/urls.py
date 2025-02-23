@@ -31,7 +31,6 @@ urlpatterns = [
     path('api/v1/book/', include('sharing.urls')),
     path('api/v1/post/', include('blog.urls')),
 
-
     re_path(r'static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(
