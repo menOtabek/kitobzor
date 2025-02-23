@@ -93,6 +93,7 @@ class BookListSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(read_only=True)
     views_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Book
         fields = ('id', 'name', 'author', 'price', 'likes_count', 'views_count', 'pages', 'comments_count',
@@ -153,7 +154,8 @@ class BookDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ('id', 'user', 'picture', 'name', 'description', 'author', 'cover_type', 'price', 'pages', 'is_active',
-                  'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'comments', 'created_at', 'updated_at')
+                  'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'comments',
+                  'created_at', 'updated_at')
 
     def get_comments(self, obj):
         comments = BookComment.objects.filter(book=obj, is_banned=False)
