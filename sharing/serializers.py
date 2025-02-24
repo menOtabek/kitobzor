@@ -21,11 +21,11 @@ class BookParamValidateSerializer(serializers.Serializer):
         return attrs
 
 
-class BookSwaggerSerializer(serializers.ModelSerializer):
+class BookCreateSwaggerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ('picture', 'name', 'description', 'author', 'cover_type',
-                  'price', 'pages', 'publication_year', 'isbn', 'is_active')
+        fields = ('name', 'author', 'picture', 'cover_type',
+                  'price', 'pages', 'publication_year', 'isbn', 'description')
         extra_kwargs = {
             'description': {'required': False},
             'isbn': {'required': False},
@@ -35,9 +35,10 @@ class BookSwaggerSerializer(serializers.ModelSerializer):
 class BookCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ('user', 'picture', 'name', 'description', 'author', 'cover_type',
+        fields = ('id', 'user', 'picture', 'name', 'description', 'author', 'cover_type',
                   'price', 'pages', 'publication_year', 'isbn')
         extra_kwargs = {
+            'id': {'required': False, 'read_only': True},
             'description': {'required': False},
             'isbn': {'required': False},
         }
@@ -114,8 +115,9 @@ class BookCommentSwaggerSerializer(serializers.Serializer):
 class BookCommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookComment
-        fields = ('user', 'book', 'comment', 'parent')
+        fields = ('id', 'user', 'book', 'comment', 'parent')
         extra_kwargs = {
+            'id': {'required': False, 'read_only': True},
             'parent': {'required': False},
         }
 
@@ -154,8 +156,8 @@ class BookDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ('id', 'user', 'picture', 'name', 'description', 'author', 'cover_type', 'price', 'pages', 'is_active',
-                  'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'comments',
-                  'created_at', 'updated_at')
+                  'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'created_at',
+                  'updated_at', 'comments')
 
     def get_comments(self, obj):
         comments = BookComment.objects.filter(book=obj, is_banned=False)
