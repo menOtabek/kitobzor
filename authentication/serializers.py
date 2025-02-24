@@ -35,9 +35,10 @@ class BotUserUpdateSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'location')
+        fields = ('id', 'phone_is_visible', 'first_name', 'last_name',
+                  'picture', 'region', 'district', 'location', 'location_is_visible')
         extra_kwargs = {
-            'phone_number': {'required': False},
+            'id': {'read_only': True, 'required': True},
             'first_name': {'required': False},
             'last_name': {'required': False},
             'picture': {'required': False},
@@ -85,3 +86,43 @@ class RefreshTokenSerializer(serializers.Serializer):
         if token.get('exp') < timezone.now().timestamp():
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED, 'Refresh token is expired')
         return data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'phone_number', 'phone_is_visible', 'role', 'first_name', 'last_name',
+                  'picture', 'region', 'district', 'location', 'location_is_visible')
+
+class UserOtherPhoneLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'location')
+
+class UserOtherPhoneSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'location')
+    def get_location(self, obj):
+        return
+
+
+class UserOtherLocationSerializer(serializers.ModelSerializer):
+    phone_number = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'location')
+    def get_phone_number(self, obj):
+        return
+
+class UserOtherSerializer(serializers.ModelSerializer):
+    phone_number = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture', 'region', 'district', 'location')
+    def get_phone_number(self, obj):
+        return
+    def get_location(self, obj):
+        return

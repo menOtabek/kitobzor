@@ -8,19 +8,14 @@ from .models import User
 from .utils import otp_generate
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import (UserCreateSerializer, BotUserUpdateSerializer,
-                          OtpGenerateSerializer, LoginSerializer,
-                          TokenSerializer, RefreshTokenSerializer, UserUpdateSerializer)
+from .serializers import (
+    UserCreateSerializer, BotUserUpdateSerializer, LoginSerializer,
+    TokenSerializer, RefreshTokenSerializer, UserUpdateSerializer,
+    UserSerializer, UserOtherSerializer, UserOtherPhoneSerializer,
+    UserOtherLocationSerializer, UserOtherPhoneLocationSerializer)
 
 
 class UserViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='User create with bot data',
-        operation_description='User create with bot data',
-        request_body=UserCreateSerializer,
-        responses={201: UserCreateSerializer()},
-        tags=['User']
-    )
     def bot_user_register(self, request):
         telegram_id = request.data.get('telegram_id')
         if User.objects.filter(telegram_id=telegram_id).exists():
@@ -31,13 +26,6 @@ class UserViewSet(ViewSet):
         serializer.save()
         return Response(data={'success': True}, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(
-        operation_summary="User's data update",
-        operation_description="User's data update",
-        request_body=BotUserUpdateSerializer,
-        responses={200: BotUserUpdateSerializer()},
-        tags=['User']
-    )
     def update_bot_user_data(self, request):
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
@@ -49,13 +37,6 @@ class UserViewSet(ViewSet):
         serializer.save()
         return Response(data={'success': True}, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        operation_summary="Otp code generate",
-        operation_description="Otp code generate for user",
-        request_body=OtpGenerateSerializer,
-        responses={201: OtpGenerateSerializer()},
-        tags=['User']
-    )
     def generate_otp_code(self, request):
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
@@ -132,4 +113,37 @@ class UserViewSet(ViewSet):
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
         serializer.save()
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Other user detail",
+        operation_description="Detail of other user",
+        responses={200: UserOtherPhoneLocationSerializer()},
+        tags=['User']
+    )
+    def other_user_detail(self, request, pk=None):
+        user = User.objects.filter(id=pk).first()
+        if not user:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
+        if user.phone_is_visible is True and user.location_is_visible is True:
+            serializer = UserOtherPhoneLocationSerializer(user, context={'request': request})
+        elif user.phone_is_visible is True and user.location_is_visible is False:
+            serializer = UserOtherPhoneSerializer(user, context={'request': request})
+        elif user.phone_is_visible is False and user.location_is_visible is True:
+            serializer = UserOtherLocationSerializer(user, context={'request': request})
+        else:
+            serializer = UserOtherSerializer(user, context={'request': request})
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="User detail",
+        operation_description="Detail of the user",
+        responses={200: UserSerializer()},
+        tags=['User']
+    )
+    def user_detail(self, request):
+        user = User.objects.filter(id=request.user.id).first()
+        if not user:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
+        serializer = UserSerializer(user, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)

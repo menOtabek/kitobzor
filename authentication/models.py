@@ -11,6 +11,8 @@ USER_ROLES = (
 
 class User(models.Model):
     phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
+    phone_is_visible = models.BooleanField(default=False)
+    location_is_visible = models.BooleanField(default=False)
     telegram_id = models.CharField(max_length=77, unique=True)
     role = models.IntegerField(choices=USER_ROLES, default=4)
     is_active = models.BooleanField(default=True)
