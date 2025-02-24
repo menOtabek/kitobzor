@@ -10,7 +10,7 @@ from django.db.models import Q
 from .paginators.books_list_paginator import paginate_books
 from .models import Book, BookComment
 from .serializers import (
-    BookParamValidateSerializer, BookSwaggerSerializer,
+    BookParamValidateSerializer, BookCreateSwaggerSerializer,
     BookCreateSerializer, BookUpdateSerializer,
     BookListSerializer, BookDetailSerializer,
     BookCommentCreateSerializer, BookCommentListSerializer,
@@ -21,7 +21,7 @@ class BookViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         operation_summary="Book create",
         operation_description="Create a new book",
-        request_body=BookSwaggerSerializer,
+        request_body=BookCreateSwaggerSerializer,
         responses={status.HTTP_201_CREATED: BookCreateSerializer()},
         tags=["Books"]
     )
@@ -158,7 +158,7 @@ class BookViewSet(viewsets.ViewSet):
             else:
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
                                                 'publication_year', 'created_at', 'updated_at').filter(
-                    book_filter,  user__role=3, is_active=True, is_banned=False).order_by('-views_count').distinct()
+                    book_filter,  user__role=3, is_active=True, is_banned=False).order_by('-views').distinct()
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         else:
@@ -181,7 +181,7 @@ class BookViewSet(viewsets.ViewSet):
             else:
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages',
                                                 'publication_year', 'created_at', 'updated_at').filter(
-                    book_filter, is_active=True, is_banned=False).order_by('-views_count').distinct()
+                    book_filter, is_active=True, is_banned=False).order_by('-views').distinct()
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         return Response(data={'result': books, 'success': True}, status=status.HTTP_200_OK)
@@ -202,7 +202,7 @@ class BookCommentViewSet(viewsets.ViewSet):
         data = request.data
         data['user'] = request.user.id
         data['book'] = book.id
-        serializer = BookCommentCreateSerializer(data, context={'request': request})
+        serializer = BookCommentCreateSerializer(data=data, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, message=serializer.errors)
         serializer.save()
@@ -215,7 +215,7 @@ class BookCommentViewSet(viewsets.ViewSet):
     )
     def delete_a_book_comment(self, request, pk):
         user = request.user
-        comment = BookComment.objects.filter(pk=pk, user=user, is_active=True, is_banned=False).first()
+        comment = BookComment.objects.filter(pk=pk, user=user, is_banned=False).first()
         if not comment:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Comment not found')
         comment.is_banned = True
