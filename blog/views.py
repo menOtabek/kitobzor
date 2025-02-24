@@ -117,9 +117,11 @@ class PostViewSet(viewsets.ViewSet):
         tags=['Posts']
     )
     def post_detail(self, request, pk=None):
+        user = request.user
         post = Post.objects.filter(pk=pk, is_active=True, is_banned=False).first()
         if not post:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
+        post.views.add(user)
         serializer = PostDetailSerializer(post, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
