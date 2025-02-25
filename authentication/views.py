@@ -68,8 +68,8 @@ class UserViewSet(ViewSet):
         access_token['login_time'] = login_time
         user.login_time = login_time
         user.save(update_fields=['login_time'])
-        return Response(data={'result': {'access_token': str(access_token), 'refresh_token': str(refresh_token),
-                                         'role': user.role}, 'success': True}, status=status.HTTP_200_OK)
+        return Response(data={'result': {'access_token': str(access_token), 'refresh_token': str(refresh_token)},
+                              'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary="Refresh token",
@@ -95,7 +95,7 @@ class UserViewSet(ViewSet):
         user.login_time = login_time
         user.save(update_fields=['login_time'])
         return Response(
-            data={'result': {'refresh_token': str(new_refresh_token), 'access_token': str(new_access_token)},
+            data={'result': {'access_token': str(new_access_token), 'refresh_token': str(new_refresh_token)},
                   'success': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
