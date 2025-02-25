@@ -27,7 +27,7 @@ class DistrictViewSet(ViewSet):
         tags=['District']
     )
     def get_district(self, request, pk):
-        districts = District.objects.get(region_id=pk)
+        districts = District.objects.filter(region_id=pk).order_by('-created_at')
         serializer = DistrictSerializer(districts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 

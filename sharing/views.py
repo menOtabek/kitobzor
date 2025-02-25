@@ -132,9 +132,9 @@ class BookViewSet(viewsets.ViewSet):
         if query.get('q'):
             book_filter &= Q(name__icontains=query.get('q')) | Q(author__icontains=query.get('q'))
         if query.get('region_id'):
-            book_filter &= Q(region_id=query.get('region_id'))
+            book_filter &= Q(user__region_id=query.get('region_id'))
         if query.get('district_id'):
-            book_filter &= Q(district_id=query.get('district_id'))
+            book_filter &= Q(user__district_id=query.get('district_id'))
 
         if query.get('is_shop') is True:
             if query.get('is_popular') is True:
@@ -147,7 +147,7 @@ class BookViewSet(viewsets.ViewSet):
             elif query.get('by_location') is True:
                 books_query = Book.objects.only('id', 'name', 'author', 'price', 'pages', 'publication_year',
                                                 'created_at', 'updated_at').filter(
-                    book_filter, user__role=3, is_active=True, s_banned=False).order_by(
+                    book_filter, user__role=3, is_active=True, is_banned=False).order_by(
                     '-like').distinct()
 
             elif query.get('by_price') is True:
