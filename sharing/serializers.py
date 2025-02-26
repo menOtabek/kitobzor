@@ -97,7 +97,7 @@ class BookListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ('id', 'name', 'author', 'price', 'likes_count', 'views_count', 'pages', 'comments_count',
+        fields = ('id', 'name', 'picture', 'author', 'price', 'likes_count', 'views_count', 'pages', 'comments_count',
                   'publication_year', 'is_liked', 'created_at', 'updated_at')
 
     def get_is_liked(self, obj):
