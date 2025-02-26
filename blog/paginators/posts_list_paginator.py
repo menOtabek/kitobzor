@@ -1,9 +1,8 @@
 from blog.serilalizers import PostListSerializer
 from django.core.paginator import Paginator
-from django.db.models import Count
 
 def paginate_posts(post_query, context: dict, page_size: int, page_number: int):
-    total_count = post_query.aggregate(total_count=Count('id'))['total_count']
+    total_count = post_query.count()
     paginator = Paginator(post_query, page_size)
     posts = paginator.get_page(page_number)
 
