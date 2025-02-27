@@ -60,7 +60,7 @@ class BookViewSet(viewsets.ViewSet):
         tags=["Books"]
     )
     def get_a_book(self, request, pk):
-        book = Book.objects.filter(pk=pk, is_banned=False).first()
+        book = Book.objects.filter(pk=pk, is_banned=False).select_related("user").first()
         if not book:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
         serializer = BookDetailSerializer(book, context={'request': request})
