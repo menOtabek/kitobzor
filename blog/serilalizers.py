@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Post, PostComment
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
+from authentication.models import User
 
 
 class PostParamValidateSerializer(serializers.Serializer):
@@ -96,17 +97,24 @@ class PostCommentListSerializer(serializers.ModelSerializer):
         return False
 
 
+class UserPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'picture')
+
+
 class PostListSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
     is_liked = serializers.SerializerMethodField(read_only=True)
     views_count = serializers.IntegerField(read_only=True)
+    user = UserPostSerializer(read_only=True)
 
     class Meta:
         model = Post
         fields = (
-        'id', 'user', 'book_name', 'book_author', 'title', 'is_liked', 'like_count',
-        'comments_count', 'views_count', 'created_at', 'updated_at')
+        'id', 'book_name', 'book_author', 'title', 'is_liked', 'like_count',
+        'comments_count', 'views_count', 'created_at', 'updated_at', 'user')
         read_only_fields = ('id', 'user')
 
     def get_is_liked(self, obj):
@@ -121,11 +129,12 @@ class PostDetailSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     like_count = serializers.IntegerField(read_only=True)
     is_liked = serializers.SerializerMethodField()
+    user = UserPostSerializer(read_only=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'user', 'book_name', 'book_author', 'title', 'is_liked', 'is_active', 'like_count',
-                  'comments_count', 'views_count', 'created_at', 'updated_at', 'description', 'comments')
+        fields = ('id', 'book_name', 'book_author', 'title', 'is_liked', 'is_active', 'like_count',
+                  'comments_count', 'views_count', 'created_at', 'updated_at', 'description', 'user', 'comments')
         read_only_fields = ('id', 'user')
 
     def get_comments(self, obj):

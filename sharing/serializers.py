@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Book, BookComment
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
+from authentication.models import User
 
 
 class BookParamValidateSerializer(serializers.Serializer):
@@ -146,18 +147,25 @@ class BookCommentListSerializer(serializers.ModelSerializer):
         return False
 
 
+class UserBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'picture')
+
+
 class BookDetailSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(read_only=True)
     views_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
     is_liked = serializers.SerializerMethodField(read_only=True)
     comments = serializers.SerializerMethodField()
+    user = UserBookSerializer(read_only=True)
 
     class Meta:
         model = Book
-        fields = ('id', 'user', 'picture', 'name', 'description', 'author', 'cover_type', 'price', 'pages', 'is_active',
+        fields = ('id', 'picture', 'name', 'description', 'author', 'cover_type', 'price', 'pages', 'is_active',
                   'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'created_at',
-                  'updated_at', 'comments')
+                  'updated_at', 'user', 'comments')
 
     def get_comments(self, obj):
         comments = BookComment.objects.filter(book=obj, is_banned=False)

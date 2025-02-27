@@ -100,10 +100,10 @@ class PostViewSet(viewsets.ViewSet):
             three_days_ago = timezone.now() - timedelta(days=3)
 
             post_query = Post.objects.filter(created_at__gte=three_days_ago, is_active=True,
-                                             is_banned=False).order_by('-like', '-created_at').distinct()
+                                             is_banned=False).select_related("user").order_by('-like', '-created_at')
         else:
             post_query = Post.objects.filter(posts_filter, is_active=True,
-                                             is_banned=False).order_by('-created_at__day', '-like').distinct()
+                                             is_banned=False).select_related("user").order_by('-created_at__day', '-like')
 
         posts = paginate_posts(post_query, context={'request': request}, page_size=params.get('page_size'),
                                page_number=params.get('page_number'))
@@ -118,7 +118,7 @@ class PostViewSet(viewsets.ViewSet):
     )
     def post_detail(self, request, pk=None):
         user = request.user
-        post = Post.objects.filter(pk=pk, is_active=True, is_banned=False).first()
+        post = Post.objects.filter(pk=pk, is_active=True, is_banned=False).select_related("user").first()
         if not post:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
         post.views.add(user)
