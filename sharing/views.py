@@ -140,20 +140,18 @@ class BookViewSet(viewsets.ViewSet):
                 three_days_ago = timezone.now() - timedelta(days=3)
                 books_query = Book.objects.filter(
                     user__role=3, created_at__gte=three_days_ago, is_active=True, is_banned=False
-                ).order_by( '-created_at__day', '-like')
+                ).order_by( '-created_at')[:20]
 
             elif query.get('by_location') is True:
                 books_query = Book.objects.filter(
-                    book_filter, user__role=3, is_active=True, is_banned=False).order_by(
-                    '-created_at')
+                    book_filter, user__role=3, is_active=True, is_banned=False).order_by('-created_at')
 
             elif query.get('by_price') is True:
                 books_query = Book.objects.filter(
-                    book_filter, user__role=3, is_active=True, is_banned=False).order_by(
-                    '-price', '-created_at')
+                    book_filter, user__role=3, is_active=True, is_banned=False).order_by('-price', '-created_at')
             else:
                 books_query = Book.objects.filter(
-                    book_filter, user__role=3, is_active=True, is_banned=False).order_by('-views')
+                    book_filter, user__role=3, is_active=True, is_banned=False).order_by('-created_at')
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         else:
@@ -161,7 +159,7 @@ class BookViewSet(viewsets.ViewSet):
                 three_days_ago = timezone.now() - timedelta(days=3)
                 books_query = Book.objects.filter(
                     created_at__gte=three_days_ago, is_active=True, user__role=4,
-                    is_banned=False).order_by( '-created_at__day', '-like')
+                    is_banned=False).order_by( '-created_at')[:20]
 
             elif query.get('by_location') is True:
                 books_query = Book.objects.filter(
@@ -171,8 +169,8 @@ class BookViewSet(viewsets.ViewSet):
                 books_query = Book.objects.filter(
                     book_filter, is_active=True, user__role=4, is_banned=False).order_by('-price', '-created_at')
             else:
-                books_query = Book.objects.filter(book_filter, is_active=True, user__role=4, is_banned=False).order_by(
-                    '-created_at')
+                books_query = Book.objects.filter(
+                    book_filter, is_active=True, user__role=4, is_banned=False).order_by('-created_at')
             books = paginate_books(books_query, context={'request': request}, page_size=query.get('page_size'),
                                    page_number=query.get('page_number'))
         return Response(data={'result': books, 'success': True}, status=status.HTTP_200_OK)

@@ -100,7 +100,7 @@ class PostViewSet(viewsets.ViewSet):
             three_days_ago = timezone.now() - timedelta(days=3)
 
             post_query = Post.objects.filter(created_at__gte=three_days_ago, is_active=True,
-                                             is_banned=False).select_related("user").order_by('-created_at__day', '-views', '-like')
+                                             is_banned=False).select_related("user").order_by('-created_at')[:20]
         else:
             post_query = Post.objects.filter(posts_filter, is_active=True,
                                              is_banned=False).select_related("user").order_by('-created_at')
