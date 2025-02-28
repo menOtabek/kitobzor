@@ -12,7 +12,8 @@ from .serializers import (
     UserCreateSerializer, BotUserUpdateSerializer, LoginSerializer,
     TokenSerializer, RefreshTokenSerializer, UserUpdateSerializer,
     UserSerializer, UserOtherSerializer, UserOtherPhoneSerializer,
-    UserOtherLocationSerializer, UserOtherPhoneLocationSerializer)
+    UserOtherLocationSerializer, UserOtherPhoneLocationSerializer,
+    UserMeSerializer)
 
 
 class UserViewSet(ViewSet):
@@ -122,7 +123,7 @@ class UserViewSet(ViewSet):
         tags=['User']
     )
     def other_user_detail(self, request, pk=None):
-        user = User.objects.filter(id=pk).first()
+        user = User.objects.filter(id=pk).prefetch_related('post_user', 'book_user').first()
         if not user:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
         if user.phone_is_visible is True and user.location_is_visible is True:
@@ -142,8 +143,21 @@ class UserViewSet(ViewSet):
         tags=['User']
     )
     def user_detail(self, request):
-        user = User.objects.filter(id=request.user.id).first()
+        user = User.objects.filter(id=request.user.id).prefetch_related('post_user', 'book_user').first()
         if not user:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
         serializer = UserSerializer(user, context={'request': request})
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Check auth me",
+        operation_description="Check authentication of user",
+        responses={200: UserMeSerializer()},
+        tags=['User']
+    )
+    def check_auth(self, request):
+        user = User.objects.filter(id=request.user.id).first()
+        if not user:
+            raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
+        serializer = UserMeSerializer(user, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
