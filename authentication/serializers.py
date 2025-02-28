@@ -111,7 +111,7 @@ class PostUserSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
+    posts = serializers.SerializerMethodField()
     books = serializers.SerializerMethodField()
 
     class Meta:
@@ -120,11 +120,14 @@ class UserSerializer(serializers.ModelSerializer):
                   'picture', 'region', 'district', 'location', 'location_is_visible', 'books', 'posts')
 
     def get_books(self, obj):
-        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+        return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
+
+    def get_posts(self, obj):
+        return PostUserSerializer(obj.post_user.filter(is_banned=False), many=True, context=self.context).data
 
 
 class UserOtherPhoneLocationSerializer(serializers.ModelSerializer):
-    posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
+    posts = serializers.SerializerMethodField()
     books = serializers.SerializerMethodField()
 
     class Meta:
@@ -133,12 +136,15 @@ class UserOtherPhoneLocationSerializer(serializers.ModelSerializer):
                   'region', 'district', 'location', 'books', 'posts')
 
     def get_books(self, obj):
-        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+        return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
+
+    def get_posts(self, obj):
+        return PostUserSerializer(obj.post_user.filter(is_banned=False), many=True, context=self.context).data
 
 
 class UserOtherPhoneSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField()
-    posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
+    posts = serializers.SerializerMethodField()
     books = serializers.SerializerMethodField()
 
     class Meta:
@@ -150,13 +156,16 @@ class UserOtherPhoneSerializer(serializers.ModelSerializer):
         return
 
     def get_books(self, obj):
-        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+        return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
+
+    def get_posts(self, obj):
+        return PostUserSerializer(obj.post_user.filter(is_banned=False), many=True, context=self.context).data
 
 
 class UserOtherLocationSerializer(serializers.ModelSerializer):
-    posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
     books = serializers.SerializerMethodField()
     phone_number = serializers.SerializerMethodField()
+    posts = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -167,14 +176,17 @@ class UserOtherLocationSerializer(serializers.ModelSerializer):
         return
 
     def get_books(self, obj):
-        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+        return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
+
+    def get_posts(self, obj):
+        return PostUserSerializer(obj.post_user.filter(is_banned=False), many=True, context=self.context).data
 
 
 class UserOtherSerializer(serializers.ModelSerializer):
-    posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
     books = serializers.SerializerMethodField()
     phone_number = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    posts = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -188,7 +200,10 @@ class UserOtherSerializer(serializers.ModelSerializer):
         return
 
     def get_books(self, obj):
-        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+        return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
+
+    def get_posts(self, obj):
+        return PostUserSerializer(obj.post_user.filter(is_banned=False), many=True, context=self.context).data
 
 
 class UserMeSerializer(serializers.ModelSerializer):
