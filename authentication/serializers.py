@@ -91,8 +91,14 @@ class RefreshTokenSerializer(serializers.Serializer):
 class BookUserSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False, read_only=True)
     name = serializers.CharField(required=False, read_only=True)
-    picture = serializers.CharField(required=False, read_only=True)
+    picture = serializers.SerializerMethodField()
     is_active = serializers.BooleanField(required=False, read_only=True)
+
+    def get_picture(self, obj):
+        request = self.context.get('request')
+        if obj.picture:
+            return request.build_absolute_uri(obj.picture.url) if request else obj.picture.url
+        return None
 
 
 class PostUserSerializer(serializers.Serializer):
@@ -106,56 +112,83 @@ class PostUserSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
-    books = BookUserSerializer(many=True, required=False, source='book_user', read_only=True)
+    books = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'phone_is_visible', 'role', 'first_name', 'last_name',
                   'picture', 'region', 'district', 'location', 'location_is_visible', 'books', 'posts')
 
+    def get_books(self, obj):
+        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+
+
 class UserOtherPhoneLocationSerializer(serializers.ModelSerializer):
     posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
-    books = BookUserSerializer(many=True, required=False, source='book_user', read_only=True)
+    books = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture',
                   'region', 'district', 'location', 'books', 'posts')
+
+    def get_books(self, obj):
+        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+
 
 class UserOtherPhoneSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField()
     posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
-    books = BookUserSerializer(many=True, required=False, source='book_user', read_only=True)
+    books = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture',
                   'region', 'district', 'location', 'books', 'posts')
+
     def get_location(self, obj):
         return
+
+    def get_books(self, obj):
+        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
 
 
 class UserOtherLocationSerializer(serializers.ModelSerializer):
     posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
-    books = BookUserSerializer(many=True, required=False, source='book_user', read_only=True)
+    books = serializers.SerializerMethodField()
     phone_number = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture',
                   'region', 'district', 'location', 'books', 'posts')
+
     def get_phone_number(self, obj):
         return
 
+    def get_books(self, obj):
+        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
+
+
 class UserOtherSerializer(serializers.ModelSerializer):
     posts = PostUserSerializer(many=True, required=False, source='post_user', read_only=True)
-    books = BookUserSerializer(many=True, required=False, source='book_user', read_only=True)
+    books = serializers.SerializerMethodField()
     phone_number = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture', 'region',
                   'district', 'location', 'books', 'posts')
+
     def get_phone_number(self, obj):
         return
+
     def get_location(self, obj):
         return
+
+    def get_books(self, obj):
+        return BookUserSerializer(obj.book_user, many=True, context=self.context).data
 
 
 class UserMeSerializer(serializers.ModelSerializer):
