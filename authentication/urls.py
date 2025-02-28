@@ -9,4 +9,5 @@ urlpatterns = [
     path('refresh/', UserViewSet.as_view({'post': 'refresh_token'}), name='refresh_token'),
     path('me/', UserViewSet.as_view({'get': 'user_detail', 'patch': 'user_update'}), name='user_detail'),
     path('<int:pk>/', UserViewSet.as_view({'get': 'other_user_detail'}), name='other_user_detail'),
+    path('me/check/', UserViewSet.as_view({'get': 'check_auth'}), name='check_auth'),
 ]
