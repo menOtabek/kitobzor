@@ -92,6 +92,7 @@ class BookUserSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False, read_only=True)
     name = serializers.CharField(required=False, read_only=True)
     picture = serializers.CharField(required=False, read_only=True)
+    is_active = serializers.BooleanField(required=False, read_only=True)
 
 
 class PostUserSerializer(serializers.Serializer):
@@ -100,6 +101,7 @@ class PostUserSerializer(serializers.Serializer):
     book_name = serializers.CharField(required=False, read_only=True)
     book_author = serializers.CharField(required=False, read_only=True)
     created_at = serializers.DateTimeField(required=False, read_only=True)
+    is_active = serializers.BooleanField(required=False, read_only=True)
 
 
 class UserSerializer(serializers.ModelSerializer):
