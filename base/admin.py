@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Region, District, Banner
+from .models import Region, District, Banner, FAQ, PrivacyPolicy
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
@@ -18,4 +18,16 @@ class DistrictAdmin(admin.ModelAdmin):
 @admin.register(Banner)
 class BannerAdmin(admin.ModelAdmin):
     list_display = ('id', 'is_active', 'title')
+    list_display_links = ('id', 'title')
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('id', 'question')
+    list_display_links = ('id', 'question')
+
+
+@admin.register(PrivacyPolicy)
+class PrivacyPolicyAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title')
     list_display_links = ('id', 'title')
