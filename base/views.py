@@ -10,7 +10,7 @@ from .models import (
 from .serializers import (
     DistrictSerializer, RegionSerializer,
     BannerSerializer, PrivacyPolicySerializer,
-    FAQSerializer, FAQQuestionSerializer, PrivacyPolicyListSerializer)
+    FAQSerializer)
 
 
 class RegionViewSet(ViewSet):
@@ -56,25 +56,12 @@ class FAQViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='FAQ question list',
         operation_description='List of FAQ questions',
-        responses={status.HTTP_200_OK: FAQQuestionSerializer(many=True)},
+        responses={status.HTTP_200_OK: FAQSerializer(many=True)},
         tags=['FAQ']
     )
     def get_faq_list(self, request):
         faqs = FAQ.objects.filter(is_active=True).order_by('-created_at')
-        serializer = FAQQuestionSerializer(faqs, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        operation_summary='FAQ detail',
-        operation_description='Detail of a FAQ',
-        responses={status.HTTP_200_OK: FAQSerializer()},
-        tags=['FAQ']
-    )
-    def get_faq_detail(self, request, pk):
-        faq = FAQ.objects.filter(id=pk, is_active=True).first()
-        if not faq:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, message='FAQ not found')
-        serializer = FAQSerializer(faq, context={'request': request})
+        serializer = FAQSerializer(faqs, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
 
@@ -82,23 +69,10 @@ class PrivacyPolicyViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Privacy policy title list',
         operation_description='List of privacy policy titles',
-        responses={status.HTTP_200_OK: PrivacyPolicyListSerializer(many=True)},
+        responses={status.HTTP_200_OK: PrivacyPolicySerializer(many=True)},
         tags=['Privacy policy']
     )
     def get_privacy_policies(self, request):
         privacy_policy = PrivacyPolicy.objects.filter(is_active=True).order_by('-created_at')
-        serializer = PrivacyPolicyListSerializer(privacy_policy, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        operation_summary='Privacy policy title detail',
-        operation_description='Detail of a privacy policy',
-        responses={status.HTTP_200_OK: PrivacyPolicySerializer()},
-        tags=['Privacy policy']
-    )
-    def get_privacy_policy_detail(self, request, pk):
-        privacy_policy = PrivacyPolicy.objects.filter(id=pk, is_active=True).first()
-        if not privacy_policy:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Privacy policy not found')
-        serializer = PrivacyPolicySerializer(privacy_policy, context={'request': request})
+        serializer = PrivacyPolicySerializer(privacy_policy, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)

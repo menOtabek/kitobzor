@@ -9,6 +9,7 @@ class RegionSerializer(serializers.ModelSerializer):
 
 
 class DistrictSerializer(serializers.ModelSerializer):
+    region = RegionSerializer(read_only=True)
     class Meta:
         model = District
         fields = ('id', 'name', 'region')
@@ -20,23 +21,10 @@ class BannerSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'picture')
 
 
-class FAQQuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FAQ
-        fields = ('id', 'question')
-
-
-
 class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
         fields = ('id', 'question', 'answer')
-
-
-class PrivacyPolicyListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PrivacyPolicy
-        fields = ('id', 'title')
 
 
 class PrivacyPolicySerializer(serializers.ModelSerializer):
