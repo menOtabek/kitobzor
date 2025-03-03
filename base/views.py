@@ -74,7 +74,7 @@ class FAQViewSet(ViewSet):
         faq = FAQ.objects.filter(id=pk, is_active=True).first()
         if not faq:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='FAQ not found')
-        serializer = FAQQuestionSerializer(faq, context={'request': request})
+        serializer = FAQSerializer(faq, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
 
