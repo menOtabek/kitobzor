@@ -91,7 +91,7 @@ class PostCommentListSerializer(serializers.ModelSerializer):
                   'created_at')
 
     def get_is_comment_liked(self, obj):
-        user = self.context['request'].user
+        user = self.context.get('request').user if 'request' in self.context else None
         if obj.like.filter(id=user.id).exists():
             return True
         return False
@@ -118,7 +118,7 @@ class PostListSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'user')
 
     def get_is_liked(self, obj):
-        user = self.context['request'].user
+        user = self.context.get('request').user if 'request' in self.context else None
         if obj.like.filter(id=user.id).exists():
             return True
         return False
@@ -130,10 +130,11 @@ class PostDetailSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(read_only=True)
     is_liked = serializers.SerializerMethodField()
     user = UserPostSerializer(read_only=True)
+    is_owner = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'book_name', 'book_author', 'title', 'is_liked', 'is_active', 'like_count',
+        fields = ('id', 'book_name', 'book_author', 'title', 'is_liked', 'is_active', 'like_count', 'is_owner',
                   'comments_count', 'views_count', 'created_at', 'updated_at', 'description', 'user', 'comments')
         read_only_fields = ('id', 'user')
 
@@ -142,7 +143,13 @@ class PostDetailSerializer(serializers.ModelSerializer):
         return PostCommentListSerializer(comments, many=True, context=self.context).data
 
     def get_is_liked(self, obj):
-        user = self.context['request'].user
+        user = self.context.get('request').user if 'request' in self.context else None
         if obj.like.filter(id=user.id).exists():
+            return True
+        return False
+
+    def get_is_owner(self, obj):
+        user = self.context.get('request').user if 'request' in self.context else None
+        if obj.user.id == user.id:
             return True
         return False
