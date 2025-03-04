@@ -92,7 +92,7 @@ class PostCommentListSerializer(serializers.ModelSerializer):
 
     def get_is_comment_liked(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
-        if obj.like.filter(id=user.id).exists():
+        if user and obj.like.filter(id=user.id).exists():
             return True
         return False
 
@@ -119,7 +119,7 @@ class PostListSerializer(serializers.ModelSerializer):
 
     def get_is_liked(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
-        if obj.like.filter(id=user.id).exists():
+        if user and obj.like.filter(id=user.id).exists():
             return True
         return False
 
@@ -144,12 +144,12 @@ class PostDetailSerializer(serializers.ModelSerializer):
 
     def get_is_liked(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
-        if obj.like.filter(id=user.id).exists():
+        if user and obj.like.filter(id=user.id).exists():
             return True
         return False
 
     def get_is_owner(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
-        if obj.user.id == user.id:
+        if user and obj.user.id == user.id:
             return True
         return False
