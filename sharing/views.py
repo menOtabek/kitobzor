@@ -4,8 +4,6 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
-from django.utils import timezone
-from datetime import timedelta
 from django.db.models import Q
 from .paginators.books_list_paginator import paginate_books
 from .models import Book, BookComment
@@ -137,9 +135,7 @@ class BookViewSet(viewsets.ViewSet):
             book_filter &= Q(user__district_id=query.get('district_id'))
         if query.get('is_shop') is True:
             if query.get('is_popular') is True:
-                three_days_ago = timezone.now() - timedelta(days=3)
-                books_query = Book.objects.filter(
-                    user__role=3, created_at__gte=three_days_ago, is_active=True, is_banned=False
+                books_query = Book.objects.filter(user__role=3, is_active=True, is_banned=False
                 ).order_by( '-created_at')[:20]
 
             elif query.get('by_location') is True:
@@ -156,9 +152,7 @@ class BookViewSet(viewsets.ViewSet):
                                    page_number=query.get('page_number'))
         else:
             if query.get('is_popular') is True:
-                three_days_ago = timezone.now() - timedelta(days=3)
-                books_query = Book.objects.filter(
-                    created_at__gte=three_days_ago, is_active=True, user__role=4,
+                books_query = Book.objects.filter(is_active=True, user__role=4,
                     is_banned=False).order_by( '-created_at')[:20]
 
             elif query.get('by_location') is True:

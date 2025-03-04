@@ -4,8 +4,6 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
-from django.utils import timezone
-from datetime import timedelta
 from django.db.models import Q
 from .paginators.posts_list_paginator import paginate_posts
 from .models import Post, PostComment
@@ -97,9 +95,7 @@ class PostViewSet(viewsets.ViewSet):
             query = params.get('q')
             posts_filter = Q(title__icontains=query) | Q(book_name__icontains=query) | Q(book_author__icontains=query)
         if params.get('is_popular') is True:
-            three_days_ago = timezone.now() - timedelta(days=3)
-
-            post_query = Post.objects.filter(created_at__gte=three_days_ago, is_active=True,
+            post_query = Post.objects.filter(is_active=True,
                                              is_banned=False).select_related("user").order_by('-created_at')[:20]
         else:
             post_query = Post.objects.filter(posts_filter, is_active=True,
