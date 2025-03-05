@@ -1,13 +1,41 @@
 import random
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import UntypedToken
-from .models import User
+from .models import User, Otp
+from django.utils.timezone import now
+from datetime import timedelta
 
 def otp_generate(user):
-    otp_code = str(random.randint(100000, 999999))
-    user.otp_code = otp_code
-    user.save()
-    return otp_code
+    otp = Otp.objects.filter(user=user).first()
+    current_time = now()
+    one_minute_ago = current_time - timedelta(minutes=1)
+    if otp and otp.created_at > one_minute_ago:
+        response = {
+            'otp_code': otp.otp_code,
+            'new': False
+        }
+        return response
+    elif otp:
+        otp.delete()
+        otp_code = str(random.randint(100000, 999999))
+        otp = Otp.objects.create(user=user, otp_code=otp_code)
+        otp.save()
+        user.otp_code = otp_code
+        user.save(update_fields=['otp_code'])
+        response = {
+            'otp_code': otp.otp_code,
+            'new': True
+        }
+        return response
+    else:
+        otp_code = str(random.randint(100000, 999999))
+        otp = Otp.objects.create(user=user, otp_code=otp_code)
+        otp.save()
+        response = {
+            'otp_code': otp.otp_code,
+            'new': True
+        }
+        return response
 
 def decode_token(token):
     try:

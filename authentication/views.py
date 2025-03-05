@@ -27,6 +27,13 @@ class UserViewSet(ViewSet):
         serializer.save()
         return Response(data={'success': True}, status=status.HTTP_201_CREATED)
 
+    def get_language(self, request):
+        telegram_id = request.data.get('telegram_id')
+        user = User.objects.filter(telegram_id=telegram_id).first()
+        if not user:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(data={'result':  user.telegram_language,'success': True}, status=status.HTTP_200_OK)
+
     def update_bot_user_data(self, request):
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
@@ -43,10 +50,8 @@ class UserViewSet(ViewSet):
         user = User.objects.filter(telegram_id=telegram_id).first()
         if not user:
             return Response(data={'success': False}, status=status.HTTP_404_NOT_FOUND)
-        otp_code = otp_generate(user)
-        user.otp_code = otp_code
-        user.save(update_fields=['otp_code'])
-        return Response(data={'otp_code': otp_code, 'success': True}, status=status.HTTP_201_CREATED)
+        response = otp_generate(user)
+        return Response(data={'result': response, 'success': True}, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         operation_summary="Login",
