@@ -15,11 +15,12 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class BotUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'telegram_id', 'phone_number', 'first_name', 'last_name')
+        fields = ('id', 'telegram_id', 'phone_number', 'first_name', 'last_name', 'telegram_language')
 
         extra_kwargs = {
             'id': {'read_only': True, 'required': True},
             'telegram_id': {'required': True, 'read_only': True},
+            'telegram_language': {'required': False},
             'phone_number': {'required': False},
             'first_name': {'required': False},
             'last_name': {'required': False},
@@ -32,13 +33,26 @@ class BotUserUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class GetLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'telegram_id', 'telegram_language', 'phone_number')
+
+        extra_kwargs = {
+            'telegram_id': {'required': True, 'read_only': True},
+            'telegram_language': {'required': False},
+            'phone_number': {'required': False},
+        }
+
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'phone_is_visible', 'first_name', 'last_name',
+        fields = ('id', 'bio', 'phone_is_visible', 'first_name', 'last_name',
                   'picture', 'region', 'district', 'location', 'location_is_visible')
         extra_kwargs = {
             'id': {'read_only': True, 'required': True},
+            'bio': {'required': False},
             'first_name': {'required': False},
             'last_name': {'required': False},
             'picture': {'required': False},
@@ -56,7 +70,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True)
-    otp_code = serializers.IntegerField(required=True)
+    otp_code = serializers.CharField(required=True, max_length=6)
 
     def validate(self, data):
         if data.get('otp_code') and (data.get('otp_code') < 100000 or data.get('otp_code') > 999999):
@@ -64,15 +78,9 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 
-class OtpGenerateSerializer(serializers.Serializer):
-    telegram_id = serializers.CharField(required=True)
-    phone_number = serializers.CharField(required=True)
-
-
 class TokenSerializer(serializers.Serializer):
     refresh_token = serializers.CharField()
     access_token = serializers.CharField()
-    role = serializers.CharField()
 
 
 class RefreshTokenSerializer(serializers.Serializer):

@@ -3,6 +3,7 @@ from .views import UserViewSet
 
 urlpatterns = [
     path('bot/register/', UserViewSet.as_view({'post': 'bot_user_register'}), name='bot_register'),
+    path('bot/language/', UserViewSet.as_view({'get': 'get_language'}), name='bot_user_language'),
     path('bot/update/', UserViewSet.as_view({'patch': 'update_bot_user_data'}), name='update_bot_user_data'),
     path('bot/generate_otp/', UserViewSet.as_view({'post': 'generate_otp_code'}), name='generate_otp_code'),
     path('login/', UserViewSet.as_view({'post': 'login'}), name='login'),
