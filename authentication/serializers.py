@@ -33,6 +33,18 @@ class BotUserUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class GetLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'telegram_id', 'telegram_language', 'phone_number')
+
+        extra_kwargs = {
+            'telegram_id': {'required': True, 'read_only': True},
+            'telegram_language': {'required': False},
+            'phone_number': {'required': False},
+        }
+
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

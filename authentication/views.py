@@ -13,26 +13,29 @@ from .serializers import (
     TokenSerializer, RefreshTokenSerializer, UserUpdateSerializer,
     UserSerializer, UserOtherSerializer, UserOtherPhoneSerializer,
     UserOtherLocationSerializer, UserOtherPhoneLocationSerializer,
-    UserMeSerializer)
+    UserMeSerializer, GetLanguageSerializer)
 
 
 class UserViewSet(ViewSet):
     def bot_user_register(self, request):
         telegram_id = request.data.get('telegram_id')
-        if User.objects.filter(telegram_id=telegram_id).exists():
+        user = User.objects.filter(telegram_id=telegram_id).first()
+        if user:
             return Response(status=status.HTTP_409_CONFLICT)
         serializer = UserCreateSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer.save()
-        return Response(data={'success': True}, status=status.HTTP_201_CREATED)
+        language_serializer = GetLanguageSerializer(user, context={'request': request})
+        return Response(data={'result': language_serializer.data, 'success': True}, status=status.HTTP_201_CREATED)
 
     def get_language(self, request):
         telegram_id = request.data.get('telegram_id')
         user = User.objects.filter(telegram_id=telegram_id).first()
         if not user:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(data={'result':  user.telegram_language,'success': True}, status=status.HTTP_200_OK)
+        serializer = GetLanguageSerializer(user, context={'request': request})
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
     def update_bot_user_data(self, request):
         telegram_id = request.data.get('telegram_id')
@@ -43,7 +46,8 @@ class UserViewSet(ViewSet):
         if not serializer.is_valid():
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer.save()
-        return Response(data={'success': True}, status=status.HTTP_200_OK)
+        serializer = GetLanguageSerializer(user, context={'request': request})
+        return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
     def generate_otp_code(self, request):
         telegram_id = request.data.get('telegram_id')
@@ -74,6 +78,7 @@ class UserViewSet(ViewSet):
         access_token['login_time'] = login_time
         user.login_time = login_time
         user.save(update_fields=['login_time'])
+        user.otp_code.delete()
         return Response(data={'result': {'access_token': str(access_token), 'refresh_token': str(refresh_token)},
                               'success': True}, status=status.HTTP_200_OK)
 

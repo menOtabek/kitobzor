@@ -10,7 +10,8 @@ class AuthenticationRequiredMiddleware(MiddlewareMixin):
             reverse('bot_register'),
             reverse('update_bot_user_data'),
             reverse('generate_otp_code'),
-            reverse('login')
+            reverse('login'),
+            reverse('bot_user_language'),
         ]
         if request.path.startswith('/api/v1/') and request.path not in exclude_target_urls:
             token = request.headers.get('Authorization')
