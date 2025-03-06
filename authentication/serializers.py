@@ -73,7 +73,8 @@ class LoginSerializer(serializers.Serializer):
     otp_code = serializers.CharField(required=True, max_length=6)
 
     def validate(self, data):
-        if data.get('otp_code') and len(data.get('otp_code')) != 6:
+        otp_code = data.get('otp_code')
+        if otp_code and len(str(otp_code)) != 6:
             raise CustomApiException(ErrorCodes.INVALID_INPUT, 'Code is invalid')
         return data
 
