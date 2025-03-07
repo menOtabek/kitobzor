@@ -69,8 +69,8 @@ class UserViewSet(ViewSet):
         serializer = LoginSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
-        user = User.objects.filter(otp_code=request.data.get('otp_code'),
-                                   phone_number=request.data.get('phone_number')).first()
+        user = User.objects.filter(otp_user__otp_code=serializer.validated_data.get('otp_code'),
+                                   phone_number=serializer.validated_data.get('phone_number')).first()
         if not user:
             raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Phone number or code is invalid')
         refresh_token = RefreshToken.for_user(user)
@@ -78,7 +78,7 @@ class UserViewSet(ViewSet):
         access_token['login_time'] = login_time
         user.login_time = login_time
         user.save(update_fields=['login_time'])
-        user.otp_code.delete()
+        user.otp_user.delete()
         return Response(data={'result': {'access_token': str(access_token), 'refresh_token': str(refresh_token)},
                               'success': True}, status=status.HTTP_200_OK)
 
