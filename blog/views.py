@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
-from django.db.models import Q
+from django.db.models import Q, Count
 from .paginators.posts_list_paginator import paginate_posts
 from .models import Post, PostComment
 from .serilalizers import (
@@ -94,14 +94,15 @@ class PostViewSet(viewsets.ViewSet):
         if params.get('q'):
             query = params.get('q')
             posts_filter = Q(title__icontains=query) | Q(book_name__icontains=query) | Q(book_author__icontains=query)
+        post_queryset = Post.objects.filter(posts_filter, is_active=True, is_banned=False).select_related('user')
         if params.get('is_popular') is True:
-            post_query = Post.objects.filter(is_active=True,
-                                             is_banned=False).select_related("user").order_by('-created_at')[:20]
+            post_queryset = post_queryset.annotate(views_count=Count('views'), comments_count=Count('post_comments'),
+                        likes_count=Count('like')).order_by('-likes_count', '-views_count', '-comments_count')[:20]
         else:
-            post_query = Post.objects.filter(posts_filter, is_active=True,
-                                             is_banned=False).select_related("user").order_by('-created_at')
+            post_queryset = post_queryset.annotate(views_count=Count('views'), comments_count=Count('post_comments'),
+                        likes_count=Count('like')).order_by('-likes_count', '-views_count', '-comments_count')
 
-        posts = paginate_posts(post_query, context={'request': request}, page_size=params.get('page_size'),
+        posts = paginate_posts(post_queryset, context={'request': request}, page_size=params.get('page_size'),
                                page_number=params.get('page_number'))
 
         return Response(data={'result': posts, 'success': True}, status=status.HTTP_200_OK)
