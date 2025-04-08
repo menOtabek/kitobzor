@@ -69,25 +69,6 @@ class BookUpdateSerializer(serializers.ModelSerializer):
         model = Book
         fields = ('user', 'picture', 'name', 'description', 'author', 'cover_type',
                   'price', 'pages', 'publication_year', 'isbn', 'is_active')
-        extra_kwargs = {
-            'user': {'required': True},
-            'picture': {'required': False},
-            'name': {'required': False},
-            'description': {'required': False},
-            'author': {'required': False},
-            'cover_type': {'required': False},
-            'price': {'required': False},
-            'pages': {'required': False},
-            'publication_year': {'required': False},
-            'isbn': {'required': False},
-            'is_active': {'required': False},
-        }
-
-    def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
 
 
 class BookListSerializer(serializers.ModelSerializer):
