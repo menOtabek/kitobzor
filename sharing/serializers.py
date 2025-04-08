@@ -112,26 +112,27 @@ class BookCommentCreateSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class UserBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'picture')
+
+
 class BookCommentListSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(read_only=True)
     replies_count = serializers.IntegerField(read_only=True)
     is_liked = serializers.SerializerMethodField(read_only=True)
+    user = UserBookSerializer(read_only=True)
 
     class Meta:
         model = BookComment
-        fields = ('id', 'user', 'book', 'comment', 'parent', 'likes_count', 'replies_count', 'is_liked', 'created_at')
+        fields = ('id', 'book', 'comment', 'parent', 'likes_count', 'replies_count', 'is_liked', 'created_at', 'user')
 
     def get_is_liked(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
         if user and obj.like.filter(id=user.id).exists():
             return True
         return False
-
-
-class UserBookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'first_name', 'last_name', 'picture')
 
 
 class BookDetailSerializer(serializers.ModelSerializer):

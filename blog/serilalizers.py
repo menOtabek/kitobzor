@@ -66,27 +66,28 @@ class PostUpdateSerializer(serializers.ModelSerializer):
         fields = ('user', 'book_name', 'book_author', 'title', 'is_active', 'description')
 
 
+class UserPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'picture')
+
+
 class PostCommentListSerializer(serializers.ModelSerializer):
     replies_count = serializers.IntegerField(read_only=True)
     comment_like_count = serializers.IntegerField(read_only=True)
     is_comment_liked = serializers.SerializerMethodField()
+    user = UserPostSerializer(read_only=True)
 
     class Meta:
         model = PostComment
-        fields = ('id', 'user', 'post', 'comment', 'comment_like_count', 'is_comment_liked', 'parent', 'replies_count',
-                  'created_at')
+        fields = ('id', 'post', 'comment', 'comment_like_count', 'is_comment_liked', 'parent', 'replies_count',
+                  'created_at', 'user')
 
     def get_is_comment_liked(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
         if user and obj.like.filter(id=user.id).exists():
             return True
         return False
-
-
-class UserPostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'first_name', 'last_name', 'picture')
 
 
 class PostListSerializer(serializers.ModelSerializer):
