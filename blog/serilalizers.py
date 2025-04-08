@@ -64,20 +64,6 @@ class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('user', 'book_name', 'book_author', 'title', 'is_active', 'description')
-        extra_kwargs = {
-            'user': {'required': True},
-            'book_name': {'required': False},
-            'book_author': {'required': False},
-            'title': {'required': False},
-            'is_active': {'required': False},
-            'description': {'required': False}
-        }
-
-    def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
 
 
 class PostCommentListSerializer(serializers.ModelSerializer):

@@ -50,7 +50,7 @@ class PostViewSet(viewsets.ViewSet):
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
         data = request.data
         data['user'] = request.user.id
-        serializer = PostUpdateSerializer(instance=post, data=data, context={'request': request})
+        serializer = PostUpdateSerializer(instance=post, data=data, partial=True, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, message=serializer.errors)
         serializer.save()
