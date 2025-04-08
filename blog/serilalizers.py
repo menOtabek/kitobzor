@@ -64,43 +64,30 @@ class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('user', 'book_name', 'book_author', 'title', 'is_active', 'description')
-        extra_kwargs = {
-            'user': {'required': True},
-            'book_name': {'required': False},
-            'book_author': {'required': False},
-            'title': {'required': False},
-            'is_active': {'required': False},
-            'description': {'required': False}
-        }
-
-    def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
-
-
-class PostCommentListSerializer(serializers.ModelSerializer):
-    replies_count = serializers.IntegerField(read_only=True)
-    comment_like_count = serializers.IntegerField(read_only=True)
-    is_comment_liked = serializers.SerializerMethodField()
-
-    class Meta:
-        model = PostComment
-        fields = ('id', 'user', 'post', 'comment', 'comment_like_count', 'is_comment_liked', 'parent', 'replies_count',
-                  'created_at')
-
-    def get_is_comment_liked(self, obj):
-        user = self.context.get('request').user if 'request' in self.context else None
-        if user and obj.like.filter(id=user.id).exists():
-            return True
-        return False
 
 
 class UserPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'picture')
+
+
+class PostCommentListSerializer(serializers.ModelSerializer):
+    replies_count = serializers.IntegerField(read_only=True)
+    comment_like_count = serializers.IntegerField(read_only=True)
+    is_comment_liked = serializers.SerializerMethodField()
+    user = UserPostSerializer(read_only=True)
+
+    class Meta:
+        model = PostComment
+        fields = ('id', 'post', 'comment', 'comment_like_count', 'is_comment_liked', 'parent', 'replies_count',
+                  'created_at', 'user')
+
+    def get_is_comment_liked(self, obj):
+        user = self.context.get('request').user if 'request' in self.context else None
+        if user and obj.like.filter(id=user.id).exists():
+            return True
+        return False
 
 
 class PostListSerializer(serializers.ModelSerializer):

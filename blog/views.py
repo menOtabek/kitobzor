@@ -50,7 +50,7 @@ class PostViewSet(viewsets.ViewSet):
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Post not found')
         data = request.data
         data['user'] = request.user.id
-        serializer = PostUpdateSerializer(instance=post, data=data, context={'request': request})
+        serializer = PostUpdateSerializer(instance=post, data=data, partial=True, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, message=serializer.errors)
         serializer.save()
@@ -96,11 +96,11 @@ class PostViewSet(viewsets.ViewSet):
             posts_filter = Q(title__icontains=query) | Q(book_name__icontains=query) | Q(book_author__icontains=query)
         post_queryset = Post.objects.filter(posts_filter, is_active=True, is_banned=False).select_related('user')
         if params.get('is_popular') is True:
-            post_queryset = post_queryset.annotate(views_count=Count('views'), comments_count=Count('post_comments'),
-                        likes_count=Count('like')).order_by('-likes_count', '-views_count', '-comments_count')[:20]
+            post_queryset = post_queryset.annotate(total_views=Count('views'), total_comments=Count('post_comments'),
+                        total_likes=Count('like')).order_by('-total_likes', '-total_views', '-total_comments', '-created_at')[:20]
         else:
-            post_queryset = post_queryset.annotate(views_count=Count('views'), comments_count=Count('post_comments'),
-                        likes_count=Count('like')).order_by('-likes_count', '-views_count', '-comments_count')
+            post_queryset = post_queryset.annotate(total_views=Count('views'), total_comments=Count('post_comments'),
+                        total_likes=Count('like')).order_by('-total_likes', '-total_comments', '-total_views', '-created_at')
 
         posts = paginate_posts(post_queryset, context={'request': request}, page_size=params.get('page_size'),
                                page_number=params.get('page_number'))

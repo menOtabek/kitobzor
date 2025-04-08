@@ -12,7 +12,7 @@ from .serializers import (
     BookCreateSerializer, BookUpdateSerializer,
     BookListSerializer, BookDetailSerializer,
     BookCommentCreateSerializer, BookCommentListSerializer,
-    BookCommentSwaggerSerializer)
+    BookCommentSwaggerSerializer, BookUpdateSwaggerSerializer)
 
 
 class BookViewSet(viewsets.ViewSet):
@@ -35,7 +35,7 @@ class BookViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         operation_summary="Book update",
         operation_description="Update a book",
-        request_body=BookUpdateSerializer,
+        request_body=BookUpdateSwaggerSerializer,
         responses={status.HTTP_200_OK: BookUpdateSerializer()},
         tags=["Books"]
     )
@@ -45,7 +45,7 @@ class BookViewSet(viewsets.ViewSet):
         book = Book.objects.filter(pk=pk, user_id=request.user.id, is_banned=False).first()
         if not book:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Book not found')
-        serializer = BookUpdateSerializer(instance=book, data=request.data, context={'request': request})
+        serializer = BookUpdateSerializer(instance=book, data=request.data, partial=True, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
         serializer.save()
