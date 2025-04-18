@@ -3,6 +3,7 @@ from .models import Book, BookComment
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 from authentication.models import User
+import html2text
 
 
 class BookParamValidateSerializer(serializers.Serializer):
@@ -143,12 +144,18 @@ class BookDetailSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     user = UserBookSerializer(read_only=True)
     is_owner = serializers.SerializerMethodField(read_only=True)
+    description = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
         fields = ('id', 'picture', 'name', 'description', 'author', 'cover_type', 'price', 'pages', 'is_active',
                   'publication_year', 'isbn', 'likes_count', 'is_liked', 'views_count', 'comments_count', 'is_owner',
                   'created_at', 'updated_at', 'user', 'comments')
+
+    def get_description(self, obj):
+        if obj.description:
+            return html2text.html2text(obj.description)
+        return ""
 
     def get_comments(self, obj):
         comments = BookComment.objects.filter(book=obj, is_banned=False)

@@ -3,6 +3,7 @@ from .models import Post, PostComment
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 from authentication.models import User
+import html2text
 
 
 class PostParamValidateSerializer(serializers.Serializer):
@@ -118,12 +119,18 @@ class PostDetailSerializer(serializers.ModelSerializer):
     is_liked = serializers.SerializerMethodField()
     user = UserPostSerializer(read_only=True)
     is_owner = serializers.SerializerMethodField(read_only=True)
+    description = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = ('id', 'book_name', 'book_author', 'title', 'is_liked', 'is_active', 'like_count', 'is_owner',
                   'comments_count', 'views_count', 'created_at', 'updated_at', 'description', 'user', 'comments')
         read_only_fields = ('id', 'user')
+
+    def get_description(self, obj):
+        if obj.description:
+            return html2text.html2text(obj.description)
+        return ""
 
     def get_comments(self, obj):
         comments = PostComment.objects.filter(post=obj, is_banned=False)

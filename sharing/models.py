@@ -1,5 +1,6 @@
 from django.db import models
 from abstract_model.base_model import BaseModel
+from tinymce.models import HTMLField
 
 COVER_TYPE = (
     (1, 'Hard'),
@@ -11,7 +12,7 @@ class Book(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='book_user')
     picture = models.ImageField(upload_to='books/pictures/')
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
+    description = HTMLField(blank=True, null=True)
     author = models.CharField(max_length=150)
     cover_type = models.IntegerField(choices=COVER_TYPE)
     price = models.PositiveIntegerField()
