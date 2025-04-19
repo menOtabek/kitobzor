@@ -125,7 +125,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'phone_is_visible', 'role', 'first_name', 'last_name',
+        fields = ('id', 'bio', 'phone_number', 'phone_is_visible', 'role', 'first_name', 'last_name',
                   'picture', 'region', 'district', 'location', 'location_is_visible', 'books', 'posts')
 
     def get_books(self, obj):
@@ -141,7 +141,7 @@ class UserOtherPhoneLocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture',
+        fields = ('id', 'bio', 'phone_number', 'first_name', 'last_name', 'picture',
                   'region', 'district', 'location', 'books', 'posts')
 
     def get_books(self, obj):
@@ -158,7 +158,7 @@ class UserOtherPhoneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture',
+        fields = ('id', 'bio', 'phone_number', 'first_name', 'last_name', 'picture',
                   'region', 'district', 'location', 'books', 'posts')
 
     def get_location(self, obj):
@@ -178,7 +178,7 @@ class UserOtherLocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture',
+        fields = ('id', 'bio', 'phone_number', 'first_name', 'last_name', 'picture',
                   'region', 'district', 'location', 'books', 'posts')
 
     def get_phone_number(self, obj):
@@ -199,7 +199,7 @@ class UserOtherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'first_name', 'last_name', 'picture', 'region',
+        fields = ('id', 'bio', 'phone_number', 'first_name', 'last_name', 'picture', 'region',
                   'district', 'location', 'books', 'posts')
 
     def get_phone_number(self, obj):
