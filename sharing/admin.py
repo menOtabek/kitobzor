@@ -4,9 +4,9 @@ from sharing.models import Book, BookComment
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'name', 'author', 'publication_year', 'is_active')
+    list_display = ('id', 'name', 'author', 'publication_year', 'is_active')
     list_filter = ('id', 'name', 'author')
-    search_fields = ('id', 'name', 'author', 'user__telegram_id')
+    search_fields = ('id', 'name', 'author')
 
 
 @admin.register(BookComment)

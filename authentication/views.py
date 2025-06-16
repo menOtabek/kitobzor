@@ -1,3 +1,5 @@
+"""
+
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -171,3 +173,5 @@ class UserViewSet(ViewSet):
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')
         serializer = UserMeSerializer(user, context={'request': request})
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+"""

@@ -1,3 +1,5 @@
+"""
+
 from rest_framework import serializers
 from .models import User
 from exceptions.exception import CustomApiException
@@ -219,3 +221,5 @@ class UserMeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'phone_number')
+
+"""

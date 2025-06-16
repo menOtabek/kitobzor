@@ -1,14 +1,13 @@
 from django.db import models
 from abstract_model.base_model import BaseModel
-from tinymce.models import HTMLField
-
+from django_ckeditor_5.fields import CKEditor5Field
 
 class Post(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='post_user')
     book_name = models.CharField(max_length=200, blank=True, null=True, db_index=True)
     book_author = models.CharField(max_length=150, blank=True, null=True, db_index=True)
     title = models.CharField(max_length=250, db_index=True)
-    description = HTMLField(blank=True, null=True)
+    description = CKEditor5Field(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_banned = models.BooleanField(default=False)
 
