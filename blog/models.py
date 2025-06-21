@@ -14,18 +14,6 @@ class Post(BaseModel):
     def __str__(self):
         return self.title
 
-    @property
-    def like_count(self):
-        return self.post_likes.count()
-
-    @property
-    def comments_count(self):
-        return self.post_comment_user.count()
-
-    @property
-    def views_count(self):
-        return self.post_views.count()
-
 
 class PostLike(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='post_likes')
@@ -50,15 +38,6 @@ class PostComment(BaseModel):
     comment = models.TextField()
     parent = models.ForeignKey(to="self", on_delete=models.CASCADE, related_name="replies", null=True, blank=True)
     is_banned = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f'Comment to {self.post} by {self.user}'
-
-    def comment_like_count(self):
-        return self.post_comment_likes.count()
-
-    def replies_count(self):
-        return self.replies.count()
 
 
 class PostCommentLike(BaseModel):

@@ -2,7 +2,8 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 from authentication.models import User
@@ -12,14 +13,17 @@ from authentication.api_endpoints.OtherProfile.serializers import UserOtherSeria
 class OtherProfileViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Other user detail",
-        operation_description="Detail of other user",
-        responses={200: UserOtherSerializer()},
-        tags=['User']
+    @extend_schema(
+        summary="Other user detail",
+        description="Detail of another user by ID",
+        responses={
+            200: UserOtherSerializer,
+            404: OpenApiResponse(description="User not found")
+        },
+        tags=["User"],
     )
     def other_user_detail(self, request, pk=None):
-        user = User.objects.filter(id=pk, is_banned=False, is_active=True).prefetch_related('book_user').first()
+        user = User.objects.filter(id=pk, is_active=True).prefetch_related('book_user').first()
 
         if not user:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='User not found')

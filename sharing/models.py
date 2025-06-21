@@ -2,11 +2,12 @@ from django.db import models
 from abstract_model.base_model import BaseModel
 from django.utils.translation import gettext_lazy as _
 from django_ckeditor_5.fields import CKEditor5Field
+from django_resized import ResizedImageField
 
 
 class Book(BaseModel):
     class OwnerType(models.TextChoices):
-        USER = 'user', _('shop')
+        USER = 'user', _('user')
         SHOP = 'shop', _('shop')
 
     class CoverType(models.TextChoices):
@@ -17,7 +18,7 @@ class Book(BaseModel):
     posted_by = models.ForeignKey(to='authentication.User', on_delete=models.SET_NULL, null=True, related_name='book_user',
                              verbose_name=_('user'))
     shop = models.ForeignKey(to='shop.Shop', on_delete=models.CASCADE, blank=True, null=True, related_name='book_shop')
-    picture = models.ImageField(upload_to='books/pictures/', verbose_name=_('picture'))
+    picture = ResizedImageField(size=[800, 800], quality=85, force_format='JPEG', upload_to='books/pictures/', verbose_name=_('picture'))
     owner_type = models.CharField(max_length=4, choices=OwnerType.choices, default=OwnerType.USER, verbose_name=_('owner type'))
     name = models.CharField(max_length=255, verbose_name=_('name'))
     language = models.CharField(max_length=55, verbose_name=_('language'))
@@ -26,6 +27,7 @@ class Book(BaseModel):
     author = models.CharField(max_length=255, verbose_name=_('author'))
     cover_type = models.CharField(max_length=4, choices=CoverType.choices, verbose_name=_('cover type'))
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('price'))
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('discount price'), blank=True, null=True)
     pages = models.PositiveIntegerField(verbose_name=_('pages number'))
     publication_year = models.PositiveIntegerField(verbose_name=_('publication year'))
     isbn = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('isbn'))
@@ -35,14 +37,33 @@ class Book(BaseModel):
     def __str__(self):
         return self.name
 
+    @property
+    def discount_percent(self):
+        if self.discount_price:
+            discount = self.price - self.discount_price
+            return int((discount / self.price) * 100)
+        return None
+
     class Meta:
         verbose_name = 'Book'
         verbose_name_plural = 'Books'
 
+    @property
+    def like_count(self):
+        return self.book_likes_count.count()
+
+    @property
+    def view_count(self):
+        return self.book_view_user.count()
+
+    @property
+    def comment_count(self):
+        return self.book_comment_user.count()
+
 
 class BookView(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='book_view_user')
-    book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_views_count')
+    book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_view_user')
 
     def __str__(self):
         return f'{self.book}, {self.user}'
@@ -57,8 +78,6 @@ class BookLike(BaseModel):
                              verbose_name=_('user'))
     book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_likes_count',
                              verbose_name=_('book'))
-    type = models.ForeignKey(to='base.LikeCategory', on_delete=models.CASCADE, related_name='book_like_type',
-                                  verbose_name=_('type'))
 
     def __str__(self):
         return f'{self.book.name}, {self.user}'
@@ -88,8 +107,6 @@ class BookCommentLike(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_('user'))
     comment = models.ForeignKey(to='BookComment', on_delete=models.CASCADE, related_name='book_comment_likes',
                                 verbose_name=_('comment'))
-    type = models.ForeignKey(to='base.LikeCategory', on_delete=models.CASCADE, related_name='book_comment_likes',
-                                  verbose_name=_('type'))
 
     def __str__(self):
         return f'{self.comment}, {self.user}'

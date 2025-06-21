@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from drf_spectacular.utils import extend_schema
 
 from authentication.models import User
 from authentication.api_endpoints.BotUserUpdate.serializers import BotUserUpdateSerializer
@@ -12,6 +12,10 @@ from authentication.utils import IsMyBot
 class BotUserUpdateViewSet(ViewSet):
     permission_classes = [IsMyBot]
 
+    @extend_schema(
+        summary="Update bot user",
+        tags=['Bot']
+    )
     def update_bot_user(self, request):
 
         telegram_id = request.data.get('telegram_id')

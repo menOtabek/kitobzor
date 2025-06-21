@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
+from drf_spectacular.utils import extend_schema
 
 from authentication.models import User
 from authentication.api_endpoints.GetBotLanguage.serializers import GetLanguageSerializer
@@ -10,6 +11,10 @@ from authentication.utils import IsMyBot
 class GetBotLanguageViewSet(ViewSet):
     permission_classes = [IsMyBot]
 
+    @extend_schema(
+        summary="Get bot language",
+        tags=['Bot']
+    )
     def get_language(self, request):
 
         telegram_id = request.data.get('telegram_id')

@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
 
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
@@ -12,11 +12,11 @@ from authentication.api_endpoints.UpdateUser.serializers import UserUpdateSerial
 class UpdateUserViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="User update",
-        operation_description="User update",
-        request_body=UserUpdateSerializer,
-        responses={200: UserUpdateSerializer()},
+    @extend_schema(
+        summary="User update",
+        description="Update authenticated user information",
+        request=UserUpdateSerializer,
+        responses={200: UserUpdateSerializer},
         tags=['User']
     )
     def user_update(self, request):

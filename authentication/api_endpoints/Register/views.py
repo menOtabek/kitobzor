@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
+from drf_spectacular.utils import extend_schema
+
 from authentication.models import User
 from authentication.api_endpoints.Register.serializers import UserCreateSerializer
 from authentication.api_endpoints.GetBotLanguage.serializers import GetLanguageSerializer
@@ -10,6 +12,10 @@ from authentication.utils import IsMyBot
 class UserViewSet(ViewSet):
     permission_classes = [IsMyBot]
 
+    @extend_schema(
+        summary="Register new user on bot",
+        tags=['Bot']
+    )
     def bot_user_register(self, request):
 
         telegram_id = request.data.get('telegram_id')

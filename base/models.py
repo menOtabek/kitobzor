@@ -28,17 +28,6 @@ class District(BaseModel):
         verbose_name_plural = 'Districts'
 
 
-class Location(gis_models.Model):
-    class LocationType(gis_models.TextChoices):
-        BOOKSHOP = 'bookshop', _('bookshop')
-        LIBRARY = 'library', _('library')
-        HOME = 'home', _('home')
-        WORKPLACE = 'workplace', _('workplace')
-
-    point = gis_models.PointField(geography=True, srid=4326, blank=True, null=True)
-    type = gis_models.CharField(choices=LocationType.choices, default=LocationType.HOME)
-
-
 class Banner(BaseModel):
     picture = models.ImageField(upload_to="banner/pictures/")
     title = models.CharField(max_length=400, blank=True, null=True)
@@ -84,18 +73,6 @@ class PrivacyPolicy(BaseModel):
         verbose_name_plural = 'PrivacyPolicies'
 
 
-class LikeCategory(BaseModel):
-    name = models.CharField(max_length=100, verbose_name=_("Name"))
-    avatar = models.ImageField(upload_to="like/avatars/", verbose_name=_("Image"))
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'LikeCategory'
-        verbose_name_plural = 'LikeCategories'
-
-
 class BasePost(BaseModel):
     title = models.CharField(max_length=400, verbose_name=_("Title"), blank=True, null=True)
     book_name = models.CharField(max_length=200, verbose_name=_("Book name"), blank=True, null=True)
@@ -126,7 +103,6 @@ class BasePostView(BaseModel):
 class BasePostLike(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_("User"))
     post = models.ForeignKey(BasePost, on_delete=models.CASCADE, verbose_name=_("Base post"))
-    type = models.ForeignKey(to='base.LikeCategory', on_delete=models.CASCADE, verbose_name=_("Like"))
 
     def __str__(self):
         return f'{self.user} - {self.post}'
@@ -155,7 +131,6 @@ class BasePostComment(BaseModel):
 class BasePostCommentLike(BaseModel):
     user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_("User"))
     comment = models.ForeignKey(BasePostComment, on_delete=models.CASCADE, verbose_name=_("Comment"))
-    type = models.ForeignKey(to='base.LikeCategory', on_delete=models.CASCADE, verbose_name=_("Like"))
 
     def __str__(self):
         return f'{self.user} - {self.comment}'

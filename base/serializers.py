@@ -1,45 +1,33 @@
 from rest_framework import serializers
-from .models import Banner, Region, District, FAQ, PrivacyPolicy
-import html2text
+from .models import Region, District, Banner, FAQ, PrivacyPolicy
+
 
 class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
-        fields = ('id', 'name')
+        fields = ['id', 'name']
 
 
 class DistrictSerializer(serializers.ModelSerializer):
-    region = RegionSerializer(read_only=True)
+
     class Meta:
         model = District
-        fields = ('id', 'name', 'region')
+        fields = ['id', 'name']
 
 
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'picture')
+        fields = ['id', 'title', 'picture']
 
 
 class FAQSerializer(serializers.ModelSerializer):
-    answer = serializers.SerializerMethodField()
     class Meta:
         model = FAQ
-        fields = ('id', 'question', 'answer')
-
-    def get_answer(self, obj):
-        if obj.answer:
-            return html2text.html2text(obj.answer)
-        return ""
+        fields = ['id', 'question', 'answer']
 
 
 class PrivacyPolicySerializer(serializers.ModelSerializer):
-    description = serializers.SerializerMethodField()
     class Meta:
         model = PrivacyPolicy
-        fields = ('id', 'title', 'description')
-
-    def get_description(self, obj):
-        if obj.description:
-            return html2text.html2text(obj.description)
-        return ""
+        fields = ['id', 'title', 'description']

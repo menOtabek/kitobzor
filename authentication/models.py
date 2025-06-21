@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
+from django_resized import ResizedImageField
+from django.contrib.gis.db import models as gis_models
 
 from base.models import District, Region
 from abstract_model.base_model import BaseModel
@@ -39,14 +41,13 @@ class User(AbstractUser):
                                 verbose_name=_('language'))
     role = models.CharField(max_length=20, choices=UserRoles.choices, verbose_name=_('role'), default=UserRoles.SIMPLE)
     is_active = models.BooleanField(default=True, verbose_name=_('is active'))
-    picture = models.ImageField(upload_to='users/pictures/', default='users/pictures/default_user.png',
-                                verbose_name=_('picture'))
+    picture = ResizedImageField(size=[1200, 1200], quality=85, force_format='JPEG', upload_to='users/pictures/',
+                                default='users/pictures/default_user.png', verbose_name=_('picture'))
     first_name = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('first name'))
     last_name = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('last name'))
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('district'))
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('region'))
-    location = models.ForeignKey('base.Location', on_delete=models.SET_NULL, null=True, blank=True,
-                                 verbose_name=_('location'))
+    point = gis_models.PointField(geography=True, srid=4326, blank=True, null=True)
     location_text = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('location text'))
 
     REQUIRED_FIELDS = ['email']

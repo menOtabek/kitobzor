@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 
@@ -14,12 +14,15 @@ from authentication.api_endpoints.Login.serializers import LoginSerializer, Toke
 class LoginAPIViewSet(ViewSet):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        operation_summary="Login",
-        operation_description="Login",
-        request_body=LoginSerializer,
-        responses={200: TokenSerializer()},
-        tags=['User']
+    @extend_schema(
+        request=LoginSerializer,
+        responses={
+            200: TokenSerializer,
+            400: OpenApiResponse(description="Invalid input"),
+        },
+        tags=["User"],
+        summary="Login",
+        description="Login with OTP code and receive JWT tokens"
     )
     def login(self, request):
         serializer = LoginSerializer(data=request.data, context={'request': request})

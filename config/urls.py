@@ -1,52 +1,38 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, re_path, include
-from django.views.static import serve
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions
+from django.urls import path, include
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
+
 
 admin.site.site_header = 'Kitobzor Admin'
 admin.site.site_title = 'Kitobzor Admin'
 admin.site.index_title = 'Welcome to dashboard'
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Kitobzor APIv1",
-        default_version="v1",
-        description="API for project Kitobzor",
-        terms_of_service="",
-        contact=openapi.Contact(email="menotabek0@gmail.com"),
-        license=openapi.License(name="BSD License"),
-    ),
-    public=True,
-    permission_classes=[permissions.AllowAny],
-)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('api/v1/auth/', include('authentication.urls')),
-    path('api/v1/', include('base.urls')),
+    path('api/v1/base/', include('base.urls')),
     path('api/v1/book/', include('sharing.urls')),
-    path('api/v1/post/', include('blog.urls')),
-
-    re_path(r'static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
-    re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    re_path(
-        r"^swagger(?P<format>\.json|\.yaml)$",
-        schema_view.without_ui(cache_timeout=0),
-        name="schema-json",
-    ),
-    re_path(
-        r"^swagger/$",
-        schema_view.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
-    ),
-    re_path(
-        r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
-    )
+    # path('api/v1/post/', include('blog.urls')),
+    path('api/v1/shop/', include('shop.urls')),
 ]
+
+
+if settings.SHOW_SWAGGER:
+    urlpatterns += [
+        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -9,7 +9,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'bio', 'app_phone_number', 'role', 'first_name', 'last_name',
-                  'picture', 'region', 'district', 'location', 'location_text', 'books',)
+                  'picture', 'region', 'district', 'point', 'location_text', 'books',)
 
     def get_books(self, obj):
         return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
