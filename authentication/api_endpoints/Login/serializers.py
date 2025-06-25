@@ -6,6 +6,7 @@ from exceptions.error_messages import ErrorCodes
 
 class LoginSerializer(serializers.Serializer):
     otp_code = serializers.CharField(required=True, max_length=6)
+    phone_number = serializers.CharField(required=True, max_length=15)
 
     def validate(self, data):
         otp_code = data.get('otp_code')

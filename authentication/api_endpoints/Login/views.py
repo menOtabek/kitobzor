@@ -29,10 +29,11 @@ class LoginAPIViewSet(ViewSet):
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.INVALID_INPUT, serializer.errors)
 
-        user = User.objects.filter(otp_user__otp_code=serializer.validated_data.get('otp_code')).first()
+        user = User.objects.filter(otp_user__otp_code=serializer.validated_data.get('otp_code'),
+                                   phone_number=serializer.validated_data.get('phone_number')).first()
 
         if not user:
-            raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Code is invalid')
+            raise CustomApiException(ErrorCodes.INVALID_INPUT, message='Code or phone number is invalid')
 
         refresh_token = RefreshToken.for_user(user)
         access_token = refresh_token.access_token
