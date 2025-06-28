@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from authentication.serializers import UserShortSerializer
+from users.serializers import UserShortSerializer
 from sharing.models import BookComment
 
 

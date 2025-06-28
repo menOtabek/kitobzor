@@ -1,9 +1,0 @@
-from authentication.api_endpoints.UpdateUser import * # noqa
-from authentication.api_endpoints.Login import * # noqa
-from authentication.api_endpoints.Profile import * # noqa
-from authentication.api_endpoints.OtherProfile import * # noqa
-from authentication.api_endpoints.Register import * # noqa
-from authentication.api_endpoints.GetBotLanguage import * # noqa
-from authentication.api_endpoints.BotUserUpdate import * # noqa
-from authentication.api_endpoints.RefreshToken import * # noqa
-from authentication.api_endpoints.SendOtp import * # noqa

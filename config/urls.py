@@ -18,7 +18,7 @@ admin.site.index_title = 'Welcome to dashboard'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
-    path('api/v1/auth/', include('authentication.urls')),
+    path('api/v1/auth/', include('users.urls')),
     path('api/v1/base/', include('base.urls')),
     path('api/v1/book/', include('sharing.urls')),
     # path('api/v1/post/', include('blog.urls')),

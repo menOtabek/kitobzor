@@ -1,8 +1,8 @@
 from django.db import models
 from abstract_model.base_model import BaseModel
 from django.utils.translation import gettext_lazy as _
-from django.contrib.gis.db import models as gis_models
 from django_ckeditor_5.fields import CKEditor5Field
+from utils.choices import PolicyType
 
 
 class Region(BaseModel):
@@ -55,10 +55,6 @@ class FAQ(BaseModel):
 
 
 class PrivacyPolicy(BaseModel):
-    class PolicyType(models.TextChoices):
-        PUBLIC = 'public', _('public')
-        BOOKSHOP = 'bookshop', _('bookshop')
-        LIBRARY = 'library', _('library')
 
     title = models.CharField(max_length=400, verbose_name=_("Title"))
     description = CKEditor5Field(verbose_name=_("Description"))
@@ -88,7 +84,7 @@ class BasePost(BaseModel):
 
 
 class BasePostView(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_("User"),
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, verbose_name=_("User"),
                              related_name='views')
     post = models.ForeignKey(BasePost, on_delete=models.CASCADE, verbose_name=_("Post"), related_name='views')
 
@@ -101,7 +97,7 @@ class BasePostView(BaseModel):
 
 
 class BasePostLike(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_("User"))
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, verbose_name=_("User"))
     post = models.ForeignKey(BasePost, on_delete=models.CASCADE, verbose_name=_("Base post"))
 
     def __str__(self):
@@ -113,7 +109,7 @@ class BasePostLike(BaseModel):
 
 
 class BasePostComment(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_("User"),
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, verbose_name=_("User"),
                              related_name='user_comments')
     post = models.ForeignKey(BasePost, on_delete=models.CASCADE, verbose_name=_("Base post"),
                              related_name='base_post_comments')
@@ -129,7 +125,7 @@ class BasePostComment(BaseModel):
 
 
 class BasePostCommentLike(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_("User"))
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, verbose_name=_("User"))
     comment = models.ForeignKey(BasePostComment, on_delete=models.CASCADE, verbose_name=_("Comment"))
 
     def __str__(self):

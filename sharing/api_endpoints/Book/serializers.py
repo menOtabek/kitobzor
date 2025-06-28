@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from authentication.serializers import UserShortSerializer
+from users.serializers import UserShortSerializer
 from sharing.models import Book
 from shop.serializers import ShopShortSerializer
 

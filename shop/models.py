@@ -14,7 +14,7 @@ class Shop(BaseModel):
     bio = models.CharField(max_length=500, verbose_name=_("Shop description"))
     picture = ResizedImageField(size=[800, 800], quality=85, force_format='JPEG', upload_to='shop/pictures',
                                 verbose_name=_("picture"))
-    owner = models.ForeignKey('authentication.User', on_delete=models.PROTECT,
+    owner = models.ForeignKey('users.User', on_delete=models.PROTECT,
                               related_name='shops', verbose_name=_('Owner'))
     star = models.PositiveIntegerField(default=0, verbose_name=_('Star'))
     district = models.ForeignKey(District, on_delete=models.PROTECT, related_name='shops', verbose_name=_('District'))
@@ -35,7 +35,7 @@ class Shop(BaseModel):
 
 class ShopStuff(BaseModel):
     shop = models.ForeignKey('Shop', on_delete=models.PROTECT, related_name='stuffs', verbose_name=_('Shop'))
-    user = models.ForeignKey('authentication.User', on_delete=models.PROTECT, related_name='stuffs',
+    user = models.ForeignKey('users.User', on_delete=models.PROTECT, related_name='stuffs',
                              verbose_name=_('User'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
@@ -48,7 +48,7 @@ class ShopStuff(BaseModel):
 
 
 class ShopFeedback(BaseModel):
-    user = models.ForeignKey('authentication.User', on_delete=models.PROTECT, related_name='User_feedback',
+    user = models.ForeignKey('users.User', on_delete=models.PROTECT, related_name='User_feedback',
                              verbose_name=_('User'))
     message = models.TextField(verbose_name=_('Message'), blank=True, null=True)
     star = models.PositiveIntegerField(verbose_name=_('Star'), validators=[MinValueValidator(1), MaxValueValidator(5)])
@@ -69,7 +69,7 @@ class Order(BaseModel):
         REJECTED = 'rejected', _('rejected')
         SOLD = 'sold', _('sold')
 
-    user = models.ForeignKey('authentication.User', on_delete=models.SET_NULL, null=True, related_name='user_order',
+    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='user_order',
                              verbose_name=_('User'))
     shop = models.ForeignKey('Shop', on_delete=models.SET_NULL, null=True, related_name='shop_order',
                              verbose_name=_('Shop'))

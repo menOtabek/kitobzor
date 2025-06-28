@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Post, PostComment
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
-from authentication.models import User
+from users.models import User
 import html2text
 
 

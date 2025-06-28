@@ -18,6 +18,7 @@ from sharing.api_endpoints.Book.serializers import (
 )
 from sharing.models import Book, BookLike, BookView
 from shop.models import Shop, ShopStuff
+from utils.choices import OwnerType
 
 
 @extend_schema(tags=["Book"])
@@ -31,7 +32,7 @@ class BookViewSet(ModelViewSet):
         owned_shop = Shop.objects.filter(owner=user, is_active=True).first()
         staff_shop = ShopStuff.objects.filter(user=user, is_active=True).first()
         shop = owned_shop or (staff_shop.shop if staff_shop else None)
-        owner_type = Book.OwnerType.SHOP if shop else Book.OwnerType.USER
+        owner_type = OwnerType.SHOP if shop else OwnerType.USER
         serializer.save(posted_by=user, shop=shop, owner_type=owner_type)
 
     @extend_schema(
@@ -109,14 +110,14 @@ class BookViewSet(ModelViewSet):
 
         if region_id:
             books = books.filter(
-                models.Q(owner_type=Book.OwnerType.SHOP, shop__region_id=region_id) |
-                models.Q(owner_type=Book.OwnerType.USER, posted_by__region_id=region_id)
+                models.Q(owner_type=OwnerType.SHOP, shop__region_id=region_id) |
+                models.Q(owner_type=OwnerType.USER, posted_by__region_id=region_id)
             )
 
         if district_id:
             books = books.filter(
-                models.Q(owner_type=Book.OwnerType.SHOP, shop__district_id=district_id) |
-                models.Q(owner_type=Book.OwnerType.USER, posted_by__district_id=district_id)
+                models.Q(owner_type=OwnerType.SHOP, shop__district_id=district_id) |
+                models.Q(owner_type=OwnerType.USER, posted_by__district_id=district_id)
             )
 
         books = books.select_related('shop', 'posted_by').order_by('-created_at')

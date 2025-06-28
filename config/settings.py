@@ -61,7 +61,7 @@ INSTALLED_APPS = [
 
     # local apps
     'base',
-    'authentication',
+    'users',
     'blog',
     'sharing',
     'shop',
@@ -119,8 +119,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 
-    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    # "PAGE_SIZE": 10,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -171,7 +171,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'authentication.User'
+AUTH_USER_MODEL = 'users.User'
 
 
 
@@ -297,15 +297,11 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID')
 BOT_SECRET_KEY = os.getenv('BOT_SECRET_KEY')
-
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'

@@ -3,19 +3,11 @@ from abstract_model.base_model import BaseModel
 from django.utils.translation import gettext_lazy as _
 from django_ckeditor_5.fields import CKEditor5Field
 from django_resized import ResizedImageField
-
+from utils.choices import OwnerType, CoverType
 
 class Book(BaseModel):
-    class OwnerType(models.TextChoices):
-        USER = 'user', _('user')
-        SHOP = 'shop', _('shop')
 
-    class CoverType(models.TextChoices):
-        HARD = 'hard', (_('hard'))
-        SOFT = 'soft', (_('soft'))
-
-
-    posted_by = models.ForeignKey(to='authentication.User', on_delete=models.SET_NULL, null=True, related_name='book_user',
+    posted_by = models.ForeignKey(to='users.User', on_delete=models.SET_NULL, null=True, related_name='book_user',
                              verbose_name=_('user'))
     shop = models.ForeignKey(to='shop.Shop', on_delete=models.CASCADE, blank=True, null=True, related_name='book_shop')
     picture = ResizedImageField(size=[800, 800], quality=85, force_format='JPEG', upload_to='books/pictures/', verbose_name=_('picture'))
@@ -62,7 +54,7 @@ class Book(BaseModel):
 
 
 class BookView(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='book_view_user')
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, related_name='book_view_user')
     book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_view_user')
 
     def __str__(self):
@@ -74,7 +66,7 @@ class BookView(BaseModel):
 
 
 class BookLike(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='book_like_user',
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, related_name='book_like_user',
                              verbose_name=_('user'))
     book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_likes_count',
                              verbose_name=_('book'))
@@ -88,7 +80,7 @@ class BookLike(BaseModel):
 
 
 class BookComment(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, related_name='book_comment_user',
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, related_name='book_comment_user',
                              verbose_name=_('user'))
     book = models.ForeignKey(to='Book', on_delete=models.CASCADE, related_name='book_comments', verbose_name=_('book'))
     comment = models.CharField(max_length=777, verbose_name=_('comment'))
@@ -104,7 +96,7 @@ class BookComment(BaseModel):
 
 
 class BookCommentLike(BaseModel):
-    user = models.ForeignKey(to='authentication.User', on_delete=models.CASCADE, verbose_name=_('user'))
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, verbose_name=_('user'))
     comment = models.ForeignKey(to='BookComment', on_delete=models.CASCADE, related_name='book_comment_likes',
                                 verbose_name=_('comment'))
 
