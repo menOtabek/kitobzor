@@ -1,8 +1,9 @@
 from django.contrib import admin
+from leaflet.admin import LeafletGeoAdmin
 from .models import User, Otp
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(LeafletGeoAdmin):
     list_display = ('telegram_id', 'is_active', 'role')
     list_display_links = ('telegram_id', 'role')
 

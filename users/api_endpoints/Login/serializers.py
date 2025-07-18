@@ -1,18 +1,10 @@
 from rest_framework import serializers
 
-from exceptions.exception import CustomApiException
-from exceptions.error_messages import ErrorCodes
-
-
 class LoginSerializer(serializers.Serializer):
-    otp_code = serializers.CharField(required=True, max_length=6)
-    phone_number = serializers.CharField(required=True, max_length=15)
-
-    def validate(self, data):
-        otp_code = data.get('otp_code')
-        if otp_code and len(str(otp_code)) != 6:
-            raise CustomApiException(ErrorCodes.INVALID_INPUT, 'Code is invalid')
-        return data
+    otp_code = serializers.RegexField(regex=r'^\d{6}$', error_messages={
+        "invalid": "OTP code must be 6 digits"
+    })
+    phone_number = serializers.CharField(max_length=15)
 
 
 class TokenSerializer(serializers.Serializer):

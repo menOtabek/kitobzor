@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+from rest_framework.filters import OrderingFilter
+from utils.filters import ShopFilter
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
@@ -15,11 +17,13 @@ from shop.models import Shop
 
 
 class ShopViewSet(ModelViewSet):
-    queryset = Shop.objects.select_related('region', 'district').all()
+    queryset = Shop.objects.all()
     permission_classes = [IsAuthenticated]
+    filter_backends = (OrderingFilter, ShopFilter)
 
     @extend_schema(
         summary="Update shop",
+        request=ShopUpdateSerializer,
         responses={200: ShopUpdateSerializer},
         tags=["Shop"]
     )
@@ -37,26 +41,17 @@ class ShopViewSet(ModelViewSet):
         serializer.save()
         return Response(data={'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 
+    def get_queryset(self):
+        return Shop.objects.filter(is_active=True)
+
     @extend_schema(
         summary="List shops",
-        parameters=[
-            OpenApiParameter(name='region_id', type=OpenApiTypes.INT, required=False, description="Filter by region id"),
-            OpenApiParameter(name='district_id', type=OpenApiTypes.INT, required=False, location=OpenApiParameter.QUERY, description="Filter by district id")
-        ],
+        parameters=ShopFilter.generate_query_parameters(),
         responses={200: ShopListSerializer(many=True)},
         tags=["Shop"]
     )
     def list(self, request, *args, **kwargs):
-        queryset = self.queryset.filter(is_active=True)
-
-        region_id = request.query_params.get('region_id')
-        district_id = request.query_params.get('district_id')
-
-        if region_id:
-            queryset = queryset.filter(region_id=region_id)
-        if district_id:
-            queryset = queryset.filter(district_id=district_id)
-
+        queryset = self.filter_queryset(self.get_queryset())
         serializer = ShopListSerializer(queryset, many=True, context={'request': request})
         return Response({'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 

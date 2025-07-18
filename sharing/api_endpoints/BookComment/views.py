@@ -6,9 +6,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from sharing.api_endpoints.Book.serializers import BookLikeSerializer
 from sharing.api_endpoints.BookComment.serializers import BookCommentSerializer, BookCommentLikeSerializer
 from sharing.models import BookComment, BookCommentLike
+from utils.filters import BookCommentFilter
+from rest_framework.filters import OrderingFilter
+
 
 
 @extend_schema(tags=["BookComment"])
@@ -16,15 +18,17 @@ class BookCommentViewSet(ModelViewSet):
     queryset = BookComment.objects.filter(is_banned=False).select_related('user', 'book', 'parent')
     serializer_class = BookCommentSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = (BookCommentFilter, OrderingFilter)
 
     @extend_schema(
         summary="List book comments",
         description="List all top-level comments for a specific book",
+        parameters=BookCommentFilter.generate_query_parameters(),
         responses={200: BookCommentSerializer(many=True)},
         tags=["BookComment"],
     )
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(is_banned=False).order_by('-created_at')
+        queryset = self.filter_queryset(self.get_queryset().filter(is_banned=False))
         serializer = self.get_serializer(queryset, many=True)
         return Response({'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
 

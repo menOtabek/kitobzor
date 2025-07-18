@@ -31,3 +31,9 @@ class OwnerType(models.TextChoices):
 class CoverType(models.TextChoices):
     HARD = 'hard', (_('hard'))
     SOFT = 'soft', (_('soft'))
+
+
+class BookType(models.TextChoices):
+    GIFT = 'gift', _('gift')
+    EXCHANGE = 'exchange', _('exchange')
+    SELLER = 'seller', _('seller')

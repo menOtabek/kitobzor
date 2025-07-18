@@ -1,8 +1,10 @@
 from django.contrib import admin
+from leaflet.admin import LeafletGeoAdmin
+
 from .models import Shop, ShopStuff
 
 @admin.register(Shop)
-class ShopAdmin(admin.ModelAdmin):
+class ShopAdmin(LeafletGeoAdmin):
     list_display = ('id', 'name', 'location_text', 'is_active')
     list_display_links = ('id', 'name')
     search_fields = ('name',)

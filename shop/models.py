@@ -16,13 +16,13 @@ class Shop(BaseModel):
                                 verbose_name=_("picture"))
     owner = models.ForeignKey('users.User', on_delete=models.PROTECT,
                               related_name='shops', verbose_name=_('Owner'))
-    star = models.PositiveIntegerField(default=0, verbose_name=_('Star'))
+    star = models.DecimalField(max_digits=2, decimal_places=1, verbose_name=_('Star'))
     district = models.ForeignKey(District, on_delete=models.PROTECT, related_name='shops', verbose_name=_('District'))
     region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name='shops', verbose_name=_('Region'))
     point = gis_models.PointField(geography=True, srid=4326, blank=True, null=True)
     location_text = models.TextField(verbose_name=_('Location text'))
     phone_number = models.CharField(max_length=15, verbose_name=_('Phone number'))
-    telegram = models.CharField(max_length=15, blank=True, null=True, verbose_name=_('Telegram'))
+    telegram = models.CharField(max_length=77, blank=True, null=True, verbose_name=_('Telegram'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     def __str__(self):
@@ -31,6 +31,16 @@ class Shop(BaseModel):
     class Meta:
         verbose_name = _('Shop')
         verbose_name_plural = _('Shops')
+
+    @property
+    def book_count(self)-> int:
+        return self.book_shop.count()
+
+    @property
+    def telegram_url(self)-> str:
+        if self.telegram:
+            return f"https://t.me/{self.telegram.lstrip('@')}"
+        return ''
 
 
 class ShopStuff(BaseModel):

@@ -1,15 +1,14 @@
 from rest_framework import serializers
+
 from users.models import User
-from users.api_endpoints.OtherProfile.serializers import BookUserSerializer
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    books = serializers.SerializerMethodField()
-
+    user_type = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = User
         fields = ('id', 'bio', 'app_phone_number', 'role', 'first_name', 'last_name',
-                  'picture', 'region', 'district', 'point', 'location_text', 'books',)
+                  'picture', 'region', 'district', 'point', 'location_text', 'user_type')
 
-    def get_books(self, obj):
-        return BookUserSerializer(obj.book_user.filter(is_banned=False), many=True, context=self.context).data
+    def get_user_type(self, obj):
+        return obj.user_type

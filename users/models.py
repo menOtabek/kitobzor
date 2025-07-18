@@ -1,6 +1,7 @@
 from django.db import models
 from django_resized import ResizedImageField
 from django.contrib.gis.db import models as gis_models
+from django.db.models import Q, UniqueConstraint
 
 from base.models import District, Region
 from abstract_model.base_model import BaseModel
@@ -8,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from .utils import validate_phone_number
 from utils.choices import Languages, UserRoles
+from users.managers import UserManager
 
 class User(AbstractUser, BaseModel):
 
@@ -30,6 +32,7 @@ class User(AbstractUser, BaseModel):
     point = gis_models.PointField(geography=True, srid=4326, blank=True, null=True)
     location_text = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('location text'))
 
+    objects = UserManager()
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'phone_number'
 
@@ -39,6 +42,16 @@ class User(AbstractUser, BaseModel):
     class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
+        constraints = [
+            UniqueConstraint(
+                fields=["telegram_id"],
+                condition=~Q(telegram_id=None),
+                name="unique_telegram_id_if_not_null"
+            )
+        ]
+    @property
+    def user_type(self)-> str:
+        return 'bookshop' if self.shops.exists() else 'public'
 
 
 class Otp(BaseModel):

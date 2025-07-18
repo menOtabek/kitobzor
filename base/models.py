@@ -1,7 +1,9 @@
 from django.db import models
-from abstract_model.base_model import BaseModel
 from django.utils.translation import gettext_lazy as _
 from django_ckeditor_5.fields import CKEditor5Field
+from django_resized import ResizedImageField
+
+from abstract_model.base_model import BaseModel
 from utils.choices import PolicyType
 
 
@@ -55,7 +57,6 @@ class FAQ(BaseModel):
 
 
 class PrivacyPolicy(BaseModel):
-
     title = models.CharField(max_length=400, verbose_name=_("Title"))
     description = CKEditor5Field(verbose_name=_("Description"))
     type = models.CharField(choices=PolicyType.choices, default=PolicyType.PUBLIC, verbose_name=_("Policy"))
@@ -73,6 +74,8 @@ class BasePost(BaseModel):
     title = models.CharField(max_length=400, verbose_name=_("Title"), blank=True, null=True)
     book_name = models.CharField(max_length=200, verbose_name=_("Book name"), blank=True, null=True)
     book_author = models.CharField(max_length=200, verbose_name=_("Author"), blank=True, null=True)
+    picture = ResizedImageField(size=[800, 800], quality=85, force_format='JPEG', upload_to="base_post/pictures/",
+                                verbose_name=_("Picture"))
     description = CKEditor5Field(verbose_name=_("Description"), blank=True, null=True)
 
     def __str__(self):
