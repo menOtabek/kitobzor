@@ -36,7 +36,7 @@ ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 # cors allowed origins
 # cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
 # CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
-CORS_ALLOWED_ORIGINS=True
+CORS_ALLOW_ALL_ORIGINS=True
 
 
 
