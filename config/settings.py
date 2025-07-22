@@ -34,9 +34,8 @@ DEBUG = os.getenv('DJANGO_DEBUG', '1') == '1'
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 # cors allowed origins
-# cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
-# CORS_ALLOWED_ORIGINS = cors_origins.split(',') if cors_origins else []
-CORS_ALLOWED_ORIGINS=True
+cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
 
 
 
