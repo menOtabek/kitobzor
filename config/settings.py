@@ -301,9 +301,6 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
-
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
