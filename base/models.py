@@ -137,3 +137,17 @@ class BasePostCommentLike(BaseModel):
     class Meta:
         verbose_name = 'BasePostCommentLike'
         verbose_name_plural = 'BasePostCommentLikes'
+
+
+class ContactUs(models.Model):
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE, verbose_name=_("User"))
+    phone = models.CharField(max_length=16, verbose_name=_('Phone'), blank=True, null=True)
+    message = models.TextField(verbose_name=_("Message"))
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user} - {self.phone}'
+
+    class Meta:
+        verbose_name = 'Contact Us'
+        verbose_name_plural = 'Contact Us'

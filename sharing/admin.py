@@ -1,5 +1,5 @@
 from django.contrib import admin
-from sharing.models import Book, BookComment, Category
+from sharing.models import Book, BookComment, Category, SubCategory
 
 
 @admin.register(Category)
@@ -20,3 +20,10 @@ class BookCommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'book', 'comment', 'is_banned')
     list_filter = ('id', 'user', 'book')
     search_fields = ('id', 'user__telegram_id', 'book')
+
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('id', 'name')
+    search_fields = ('id', 'name')

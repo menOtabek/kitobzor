@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Region, District, Banner, FAQ, PrivacyPolicy
+from .models import Region, District, Banner, FAQ, PrivacyPolicy, ContactUs
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
@@ -31,3 +31,9 @@ class FAQAdmin(admin.ModelAdmin):
 class PrivacyPolicyAdmin(admin.ModelAdmin):
     list_display = ('id', 'title')
     list_display_links = ('id', 'title')
+
+
+@admin.register(ContactUs)
+class ContactUsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'message', 'phone')
+    list_display_links = ('id', 'message')

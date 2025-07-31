@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     RegionViewSet, DistrictViewSet,
-    BannerViewSet, FAQViewSet, PrivacyPolicyViewSet
+    BannerViewSet, FAQViewSet, PrivacyPolicyViewSet, ContactUsCreateAPIView
 )
 
 urlpatterns = [
@@ -10,4 +10,5 @@ urlpatterns = [
     path('banners/', BannerViewSet.as_view({'get': 'list'}), name='banner-list'),
     path('faqs/', FAQViewSet.as_view({'get': 'list'}), name='faq-list'),
     path('policies/', PrivacyPolicyViewSet.as_view({'get': 'list'}), name='policy-list'),
+    path('contact-us/', ContactUsCreateAPIView.as_view(), name='contact-us-create'),
 ]

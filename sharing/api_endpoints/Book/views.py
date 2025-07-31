@@ -6,16 +6,16 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from utils.filters import BookFilter
+from utils.filters import BookFilter, SubCategoryFilter
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from sharing.api_endpoints.Book.serializers import (
     BookCreateSerializer, BookUpdateSerializer, BookDetailSerializer,
-    BookListSerializer, BookLikeSerializer, CategoryListSerializer,
+    BookListSerializer, BookLikeSerializer, CategoryListSerializer, SubCategoryListSerializer,
 )
-from sharing.models import Book, BookLike, BookView, Category
+from sharing.models import Book, BookLike, BookView, Category, SubCategory
 from shop.models import Shop, ShopStuff
 from utils.choices import OwnerType
 
@@ -153,6 +153,20 @@ class CategoryViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(summary="List all categories of book", responses={200: CategoryListSerializer(many=True)})
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'result': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=["Book"], parameters=SubCategoryFilter.generate_query_parameters())
+class SubCategoryViewSet(ReadOnlyModelViewSet):
+    queryset = SubCategory.objects.all()
+    serializer_class = SubCategoryListSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [OrderingFilter, SubCategoryFilter]
+
+    @extend_schema(summary="List all subcategories of book", responses={200: SubCategoryListSerializer(many=True)})
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)

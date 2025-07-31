@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from django_resized import ResizedImageField
 from django.contrib.gis.db import models as gis_models
 
-
 from base.models import BaseModel
 from base.models import Region, District
 
@@ -14,8 +13,7 @@ class Shop(BaseModel):
     bio = models.CharField(max_length=500, verbose_name=_("Shop description"))
     picture = ResizedImageField(size=[800, 800], quality=85, force_format='JPEG', upload_to='shop/pictures',
                                 verbose_name=_("picture"))
-    owner = models.ForeignKey('users.User', on_delete=models.PROTECT,
-                              related_name='shops', verbose_name=_('Owner'))
+    owner = models.ForeignKey('users.User', on_delete=models.PROTECT, related_name='shops', verbose_name=_('Owner'))
     star = models.DecimalField(max_digits=2, decimal_places=1, verbose_name=_('Star'))
     district = models.ForeignKey(District, on_delete=models.PROTECT, related_name='shops', verbose_name=_('District'))
     region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name='shops', verbose_name=_('Region'))
@@ -23,7 +21,13 @@ class Shop(BaseModel):
     location_text = models.TextField(verbose_name=_('Location text'))
     phone_number = models.CharField(max_length=15, verbose_name=_('Phone number'))
     telegram = models.CharField(max_length=77, blank=True, null=True, verbose_name=_('Telegram'))
+    instagram = models.CharField(max_length=77, blank=True, null=True, verbose_name=_('Instagram'))
+    website = models.CharField(max_length=77, blank=True, null=True, verbose_name=_('Website'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+    working_days = models.CharField(max_length=100, verbose_name=_('Working days'), default="Monday-Saturday")
+    working_hours = models.CharField(max_length=50, verbose_name=_('Working hours'), default="09:00 - 18:00")
+    lunch = models.CharField(max_length=50, verbose_name=_('Lunch'), default="13:00 - 14:00")
+    has_post_service = models.BooleanField(default=False, verbose_name=_("Has postal service"))
 
     def __str__(self):
         return self.name
@@ -35,12 +39,6 @@ class Shop(BaseModel):
     @property
     def book_count(self)-> int:
         return self.book_shop.count()
-
-    @property
-    def telegram_url(self)-> str:
-        if self.telegram:
-            return f"https://t.me/{self.telegram.lstrip('@')}"
-        return ''
 
 
 class ShopStuff(BaseModel):

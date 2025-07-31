@@ -270,11 +270,6 @@ class DistrictFilter(BaseModelFilter):
         {'name': 'region', 'type': int, 'description': 'Filter by region ID'},
     ]
 
-    def filter_queryset(self, request, queryset, view):
-        print(request.query_params)
-        print(request.user)
-        return super().filter_queryset(request, queryset, view)
-
     SEARCH_FIELDS = ['name']
 
 
@@ -290,10 +285,20 @@ class PrivacyPolicyFilter(BaseModelFilter):
 
         return parameters
 
+
+class SubCategoryFilter(BaseModelFilter):
+    FIELDS = BaseModelFilter.FIELDS + [
+        {'name': 'category', 'type': int, 'description': 'Filter by category ID'},
+    ]
+
+    SEARCH_FIELDS = ['name', 'category__name']
+
+
 class BookFilter(BaseModelFilter):
     ORDERING_FIELDS = BaseModelFilter.ORDERING_FIELDS + ['price', 'publication_year']
     FIELDS = BaseModelFilter.FIELDS + [
         {'name': 'category', 'type': int, 'description': 'Filter by category ID'},
+        {'name': 'sub_category', 'type': int, 'description': 'Filter by sub_category ID'},
         {'name': 'shop', 'type': int, 'description': 'Filter by shop ID'},
         {'name': 'posted_by', 'type': int, 'description': 'Filter by posted user ID'},
         {'name': 'type', 'type': str, 'description': 'Filter by type'},
@@ -304,11 +309,11 @@ class BookFilter(BaseModelFilter):
     ]
 
     RANGE_FIELDS = [
-        {'name': 'amount', 'type': float, 'description': 'Filter amount'},
+        {'name': 'price', 'type': float, 'description': 'Filter price'},
         {'name': 'publication_year', 'type': int, 'description': 'Filter by publication year'},
     ]
 
-    SEARCH_FIELDS = ['name', 'author', 'category__name']
+    SEARCH_FIELDS = ['name', 'author', 'category__name', 'sub_category__name',]
 
     # @staticmethod
     # def generate_query_parameters():

@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from users.serializers import UserShortSerializer
-from sharing.models import Book, Category
+from sharing.models import Book, Category, SubCategory
 from shop.serializers import ShopShortSerializer
 
 
@@ -10,6 +10,12 @@ class CategoryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'picture')
+
+
+class SubCategoryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategory
+        fields = ('id', 'name')
 
 
 class BookBaseSerializer(serializers.ModelSerializer):

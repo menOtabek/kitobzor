@@ -6,17 +6,14 @@ from utils.short_serializers import PointField
 
 class ShopBaseSerializer(serializers.ModelSerializer):
     point = PointField()
-    telegram_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Shop
         fields = (
-            'id', 'name', 'bio', 'picture', 'owner', 'star', 'district', 'telegram_url',
-            'region', 'point', 'location_text', 'phone_number', 'telegram', 'is_active'
+            'id', 'name', 'bio', 'picture', 'owner', 'star', 'district',
+            'region', 'point', 'location_text', 'phone_number', 'telegram', 'is_active',
+            'instagram', 'website', 'working_days', 'working_hours', 'lunch', 'has_post_service'
         )
-
-    def get_telegram_url(self, obj):
-        return obj.telegram_url
 
 
 class ShopUpdateSerializer(ShopBaseSerializer):

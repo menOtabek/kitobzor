@@ -1,5 +1,5 @@
 from django.urls import path
-from sharing.api_endpoints.Book.views import BookViewSet, BookLikeViewSet, CategoryViewSet
+from sharing.api_endpoints.Book.views import BookViewSet, BookLikeViewSet, CategoryViewSet, SubCategoryViewSet
 
 urlpatterns = [
     path('create/', BookViewSet.as_view({'post': 'create'})),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('liked/', BookViewSet.as_view({'get': 'liked'})),
     path('like/', BookLikeViewSet.as_view({'post': 'create'})),
     path('categories/', CategoryViewSet.as_view({'get': 'list'})),
+    path('subcategories/', SubCategoryViewSet.as_view({'get': 'list'})),
 ]

@@ -3,12 +3,15 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from utils.response import success_response
 from rest_framework.filters import OrderingFilter
+from rest_framework.views import APIView
+from rest_framework import status
+from .utils import send_telegram_message_code
 
 
 from .models import Region, District, Banner, FAQ, PrivacyPolicy
 from .serializers import (
     RegionSerializer, DistrictSerializer,
-    BannerSerializer, FAQSerializer, PrivacyPolicySerializer
+    BannerSerializer, FAQSerializer, PrivacyPolicySerializer, ContactUsSerializer
 )
 from utils.filters import DistrictFilter, PrivacyPolicyFilter
 
@@ -76,3 +79,16 @@ class PrivacyPolicyViewSet(ReadOnlyModelViewSet):
     @extend_schema(responses=PrivacyPolicySerializer(many=True), summary="List of privacy policies")
     def list(self, request, *args, **kwargs):
         return success_response(self.get_serializer(self.filter_queryset(self.get_queryset()), many=True).data)
+
+
+@extend_schema(tags=["Base"])
+class ContactUsCreateAPIView(APIView):
+    serializer_class = ContactUsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ContactUsSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        send_telegram_message_code(instance, request)
+        return success_response(serializer.data, code=status.HTTP_201_CREATED)

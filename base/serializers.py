@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, District, Banner, FAQ, PrivacyPolicy
+from .models import Region, District, Banner, FAQ, PrivacyPolicy, ContactUs
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -31,3 +31,13 @@ class PrivacyPolicySerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivacyPolicy
         fields = ['id', 'title', 'description']
+
+
+class ContactUsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUs
+        fields = ('phone', 'message')
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        return ContactUs.objects.create(user=user, **validated_data)
