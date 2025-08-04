@@ -305,7 +305,7 @@ class BookFilter(BaseModelFilter):
         {'name': 'owner_type', 'type': str, 'description': 'Filter by owner_type'},
         {'name': 'cover_type', 'type': str, 'description': 'Filter by cover_type'},
         {'name': 'is_active', 'type': bool, 'description': 'Filter by is_active'},
-        {'name': 'is_new', 'type': bool, 'description': 'Filter by is_new'},
+        {'name': 'is_used', 'type': bool, 'description': 'Filter by is_used'},
         {'name': 'for_home_page', 'type': bool, 'description': 'Filter by for_home_page'},
     ]
 
