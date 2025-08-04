@@ -49,6 +49,8 @@ class Book(BaseModel):
     shop = models.ForeignKey(to='shop.Shop', on_delete=models.CASCADE, blank=True, null=True, related_name='book_shop')
     picture = ResizedImageField(size=[800, 800], quality=85, force_format='JPEG', upload_to='books/pictures/',
                                 verbose_name=_('picture'))
+    is_used = models.BooleanField(default=False, verbose_name=_('is new'))
+    for_home_page = models.BooleanField(default=False, verbose_name=_('for home page'))
     owner_type = models.CharField(max_length=4, choices=OwnerType.choices, default=OwnerType.USER,
                                   verbose_name=_('owner type'))
     name = models.CharField(max_length=255, verbose_name=_('name'))

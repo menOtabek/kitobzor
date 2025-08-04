@@ -304,8 +304,9 @@ class BookFilter(BaseModelFilter):
         {'name': 'type', 'type': str, 'description': 'Filter by type'},
         {'name': 'owner_type', 'type': str, 'description': 'Filter by owner_type'},
         {'name': 'cover_type', 'type': str, 'description': 'Filter by cover_type'},
-        {'name': 'is_active', 'type': str, 'description': 'Filter by is_active'},
-
+        {'name': 'is_active', 'type': bool, 'description': 'Filter by is_active'},
+        {'name': 'is_new', 'type': bool, 'description': 'Filter by is_new'},
+        {'name': 'for_home_page', 'type': bool, 'description': 'Filter by for_home_page'},
     ]
 
     RANGE_FIELDS = [
@@ -374,8 +375,8 @@ class ShopFilter(BaseModelFilter):
     FIELDS = BaseModelFilter.FIELDS + [
         {'name': 'owner', 'type': int, 'description': 'Filter by owner ID'},
         {'name': 'region', 'type': int, 'description': 'Filter by region ID'},
-        {'name': 'district', 'type': str, 'description': 'Filter by district ID'},
-        {'name': 'is_active', 'type': str, 'description': 'Filter by is_active'},
+        {'name': 'district', 'type': int, 'description': 'Filter by district ID'},
+        {'name': 'is_active', 'type': bool, 'description': 'Filter by is_active'},
     ]
 
     RANGE_FIELDS = [
@@ -413,7 +414,7 @@ class BookCommentFilter(BaseModelFilter):
     FIELDS = BaseModelFilter.FIELDS + [
         {'name': 'book', 'type': int, 'description': 'Filter by book ID'},
         {'name': 'user', 'type': int, 'description': 'Filter by user ID'},
-        {'name': 'parent', 'type': str, 'description': 'Filter by parent ID'},
+        {'name': 'parent', 'type': int, 'description': 'Filter by parent ID'},
     ]
 
 

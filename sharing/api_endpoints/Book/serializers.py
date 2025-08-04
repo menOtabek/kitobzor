@@ -38,8 +38,8 @@ class BookCreateSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'picture', 'name', 'language', 'description', 'script_type', 'author',
-            'cover_type', 'price', 'discount_price', 'publication_year', 'pages',
+            'id', 'category', 'sub_category', 'is_used', 'picture', 'name', 'language', 'description', 'script_type',
+            'author', 'cover_type', 'price', 'discount_price', 'publication_year', 'pages',
             'isbn', 'posted_by', 'shop', 'owner_type', 'percentage'
         )
         read_only_fields = ['posted_by', 'shop', 'owner_type']
@@ -49,9 +49,8 @@ class BookUpdateSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'picture', 'name', 'language', 'description', 'script_type', 'author',
-            'cover_type', 'price', 'discount_price', 'publication_year', 'pages',
-            'isbn'
+            'id', 'category', 'sub_category', 'is_used', 'picture', 'name', 'language', 'description', 'script_type',
+            'author', 'cover_type', 'price', 'discount_price', 'publication_year', 'pages', 'isbn'
         )
         extra_kwargs = {
             'name': {'required': False},
@@ -66,6 +65,9 @@ class BookUpdateSerializer(BookBaseSerializer):
             'pages': {'required': False},
             'isbn': {'required': False},
             'picture': {'required': False},
+            'category': {'required': False},
+            'sub_category': {'required': False},
+            'is_used': {'required': False},
         }
 
 
@@ -80,8 +82,8 @@ class BookDetailSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'picture', 'name', 'language', 'description', 'script_type', 'author',
-            'cover_type', 'price', 'discount_price', 'publication_year', 'pages',
+            'id', 'is_used', 'picture', 'name', 'language', 'description', 'script_type', 'author',
+            'cover_type', 'price', 'discount_price', 'publication_year', 'pages', 'is_new',
             'isbn', 'posted_by', 'shop', 'owner_type', 'percentage', 'can_update', 'created_at',
             'like_count', 'view_count', 'comment_count'
         )
@@ -105,7 +107,7 @@ class BookListSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'name', 'author', 'price', 'discount_price',
+            'id', 'is_used', 'name', 'author', 'price', 'discount_price', 'picture', 'is_new'
             'posted_by', 'shop', 'owner_type', 'percentage', 'like_count', 'view_count', 'created_at',
         )
 
