@@ -92,7 +92,7 @@ class Book(BaseModel):
 
     @property
     def comment_count(self):
-        return self.book_comment_user.count()
+        return self.book_comments.count()
 
 
 class BookView(BaseModel):

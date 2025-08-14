@@ -38,7 +38,7 @@ class BookCreateSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'category', 'sub_category', 'is_used', 'picture', 'name', 'language', 'description', 'script_type',
+            'id', 'type', 'category', 'sub_category', 'is_used', 'picture', 'name', 'language', 'description', 'script_type',
             'author', 'cover_type', 'price', 'discount_price', 'publication_year', 'pages',
             'isbn', 'posted_by', 'shop', 'owner_type', 'percentage'
         )
@@ -49,10 +49,11 @@ class BookUpdateSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'category', 'sub_category', 'is_used', 'picture', 'name', 'language', 'description', 'script_type',
+            'id', 'type', 'category', 'sub_category', 'is_used', 'picture', 'name', 'language', 'description', 'script_type',
             'author', 'cover_type', 'price', 'discount_price', 'publication_year', 'pages', 'isbn'
         )
         extra_kwargs = {
+            'type': {'required': False},
             'name': {'required': False},
             'language': {'required': False},
             'description': {'required': False},
@@ -82,7 +83,7 @@ class BookDetailSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'is_used', 'picture', 'name', 'language', 'description', 'script_type', 'author',
+            'id', 'type', 'is_used', 'picture', 'name', 'language', 'description', 'script_type', 'author',
             'cover_type', 'price', 'discount_price', 'publication_year', 'pages',
             'isbn', 'posted_by', 'shop', 'owner_type', 'percentage', 'can_update', 'created_at',
             'like_count', 'view_count', 'comment_count'
@@ -107,7 +108,7 @@ class BookListSerializer(BookBaseSerializer):
     class Meta:
         model = Book
         fields = (
-            'id', 'is_used', 'name', 'author', 'price', 'discount_price', 'picture',
+            'id', 'type', 'is_used', 'name', 'author', 'price', 'discount_price', 'picture',
             'posted_by', 'shop', 'owner_type', 'percentage', 'like_count', 'view_count', 'created_at',
         )
 
